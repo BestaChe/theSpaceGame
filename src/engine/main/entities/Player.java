@@ -79,7 +79,7 @@ public class Player {
 			this.x += Math.sin( Math.toRadians(this.rotation)-Math.PI/2 )*velocity;
 			this.y -= Math.cos( Math.toRadians(this.rotation)-Math.PI/2 )*velocity;
 		}
-		this.velocity = 0.5;
+		this.velocity = 0.4;
 		
 		
 	}
