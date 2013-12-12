@@ -1,5 +1,7 @@
 package engine.main.entities;
 
+import org.newdawn.slick.Image;
+
 public class Planet extends AstronomicalObject {
 
 	private String name;
@@ -15,8 +17,8 @@ public class Planet extends AstronomicalObject {
 	 * @param terrestrian - boolean is the planet not gas typed
 	 * @param temperature - int temperature of the planet
 	 */
-	public Planet(String name, int x, int y, int scale, boolean terrestrian, int temperature) {
-		super(x, y, scale);
+	public Planet(String name, int x, int y, int scale, boolean terrestrian, int temperature, Image image) {
+		super(x, y, scale, image);
 		
 		this.name = name;
 		this.terrestrian = terrestrian;

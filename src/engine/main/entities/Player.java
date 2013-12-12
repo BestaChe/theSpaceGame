@@ -8,6 +8,8 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.SpriteSheet;
 import org.newdawn.slick.geom.Rectangle;
 
+import engine.main.Camera;
+
 public class Player {
 	
 	private float x;
@@ -45,10 +47,10 @@ public class Player {
 	 * @param window - GameContainer window
 	 * @param dt - int delta time
 	 */
-	public void update( GameContainer window, int dt ) {
+	public void update( GameContainer window, int dt, Camera cam ) {
 		
 		// controls bitch
-		this.controls(window, dt);
+		this.controls(window, dt, cam);
 		this.image.setRotation( (float)rotation );
 		
 	}
@@ -69,9 +71,9 @@ public class Player {
 	 * @param window - GameContainer window
 	 * @param dt - int delta time
 	 */
-	public void controls( GameContainer window, int dt ) {
+	public void controls( GameContainer window, int dt, Camera cam ) {
 		
-		this.rotation = Math.toDegrees(Math.atan2(this.y - window.getInput().getMouseY(), this.x - window.getInput().getMouseX()));
+		this.rotation = Math.toDegrees(Math.atan2((this.y-window.getInput().getMouseY())-cam.camY(),(this.x-window.getInput().getMouseX())-cam.camX()));
 		
 		if ( window.getInput().isKeyPressed(Input.KEY_W) || window.getInput().isKeyDown(Input.KEY_W)) {
 			
@@ -82,5 +84,13 @@ public class Player {
 		this.velocity = 0.4;
 		
 		
+	}
+	
+	public float x() {
+		return this.x;
+	}
+	
+	public float y() {
+		return this.y;
 	}
 }

@@ -1,4 +1,5 @@
 package engine.main.entities;
+import org.newdawn.slick.Image;
 import org.newdawn.slick.geom.Circle;
 
 public class AstronomicalObject {
@@ -6,6 +7,8 @@ public class AstronomicalObject {
 	private int x;
 	private int y;
 	private int scale;
+	
+	private Image image;
 	private Circle shape;
 	
 	/**
@@ -14,11 +17,12 @@ public class AstronomicalObject {
 	 * @param y - y position of the object
 	 * @param scale - the scale of the object
 	 */
-	public AstronomicalObject( int x, int y, int scale ) {
+	public AstronomicalObject( int x, int y, int scale, Image image ) {
 		this.x = x;
 		this.y = y;
 		this.scale = scale;
-		this.shape = new Circle( x, y, scale*32 );
+		this.shape = new Circle( x, y, scale*64 );
+		this.image = image;
 	}
 	
 	/**
@@ -51,6 +55,14 @@ public class AstronomicalObject {
 	 */
 	public Circle shape() {
 		return this.shape;
+	}
+	
+	/**
+	 * Returns the image
+	 * @return Image image
+	 */
+	public Image image() {
+		return this.image;
 	}
 	
 }

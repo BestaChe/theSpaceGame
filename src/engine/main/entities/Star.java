@@ -2,6 +2,8 @@ package engine.main.entities;
 
 import java.util.ArrayList;
 
+import org.newdawn.slick.Image;
+
 public class Star extends AstronomicalObject {
 
 	private String name;
@@ -16,8 +18,8 @@ public class Star extends AstronomicalObject {
 	 * @param scale - int scale of the star
 	 * @param temperature - int kelvin temperature of the star
 	 */
-	public Star(String name, int x, int y, int scale, long temperature ) {
-		super(x, y, scale);
+	public Star(String name, int x, int y, int scale, long temperature, Image image ) {
+		super(x, y, scale, image);
 		
 		this.name = name;
 		this.temperature = temperature;
@@ -56,6 +58,13 @@ public class Star extends AstronomicalObject {
 		this.childs.add( child );
 	}
 	
+	/**
+	 * Returns the list of child planets!
+	 * @return arraylist
+	 */
+	public ArrayList<Planet> getChildPlanets() {
+		return this.childs;
+	}
 	/**
 	 * Returns how many planets there are in this system
 	 * @return int number of planets
