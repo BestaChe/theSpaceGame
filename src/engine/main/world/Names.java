@@ -22,13 +22,9 @@ public class Names {
 		StringBuilder result = new StringBuilder();
 		
 		result.append( motherstar.name() + " ");
-		for( int i = 0; i <= Names.PlanetNames.length - 1; i++ ) {
-			result.append( Names.PlanetNames[i] );
-		}
+		result.append( Names.PlanetNames[rand.nextInt(Names.PlanetNames.length)] );
 		result.append(" ");
-		for( int i = 0; i <= Names.AfterName.length - 1; i++ ) {
-			result.append( Names.AfterName[i] );
-		}
+		result.append( Names.AfterName[rand.nextInt(Names.AfterName.length)] );
 		
 		return result.toString();
 		
@@ -38,17 +34,11 @@ public class Names {
 		
 		StringBuilder result = new StringBuilder();
 		
-		for( int i = 0; i <= Names.StarNames.length - 1; i++ ) {
-			result.append( Names.StarNames[i] );
-		}
+		result.append( "Orphan Planet" );
 		result.append(" ");
-		for( int i = 0; i <= Names.PlanetNames.length - 1; i++ ) {
-			result.append( Names.PlanetNames[i] );
-		}
+		result.append( Names.PlanetNames[rand.nextInt(Names.PlanetNames.length)] );
 		result.append(" ");
-		for( int i = 0; i <= Names.AfterName.length - 1; i++ ) {
-			result.append( Names.AfterName[i] );
-		}
+		result.append( Names.AfterName[rand.nextInt(Names.AfterName.length)] );
 		
 		return result.toString();
 		
@@ -58,13 +48,9 @@ public class Names {
 		
 		StringBuilder result = new StringBuilder();
 		
-		for( int i = 0; i <= Names.StarNames.length - 1; i++ ) {
-			result.append( Names.StarNames[i] );
-		}
+		result.append( Names.StarNames[rand.nextInt(Names.StarNames.length)] );
 		result.append(" ");
-		for( int i = 0; i <= Names.AfterName.length - 1; i++ ) {
-			result.append( Names.AfterName[i] );
-		}
+		result.append( Names.AfterName[rand.nextInt(Names.AfterName.length)] );
 		
 		return result.toString();
 		

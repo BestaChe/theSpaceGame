@@ -23,6 +23,7 @@ public class World {
 	private ArrayList<Star> allStars;
 	
 	private Random generator = new Random();
+	protected String worldDetails;
 	
 	/**
 	 * 
@@ -36,6 +37,10 @@ public class World {
 		this.allStars = new ArrayList<Star>();
 	}
 	
+	/**
+	 * 
+	 * @throws SlickException
+	 */
 	public void generateWorld() throws SlickException {
 		
 		int numberOfStars = (int)((World.MAX_STARS * this.density)+0.5);
@@ -49,7 +54,7 @@ public class World {
 		for ( int i = 1; i <= numberOfStars; i++ ) {
 			
 			int randTemp = generator.nextInt(15001) + 4000; // minimum 4000, maximum 11000 kelvin
-			int randScale = generator.nextInt(7) + 1; // minimum 1, maximum 6
+			int randScale = generator.nextInt(4) + 1; // minimum 1, maximum 6
 			int randX = generator.nextInt(6001)-3000; // minimum -3000, maximum 3000
 			int randY = generator.nextInt(6001)-3000; // minimum -3000, maximum 3000
 			Image starImage = new Image( "gfx/star_1.png");
@@ -64,7 +69,7 @@ public class World {
 		for ( int i = 1; i <= numberOfPlanets; i++ ) {
 			
 			int randTemp = generator.nextInt(451); // minimum 0, maximum 450 kelvin
-			int randScale = generator.nextInt(3) + 1; // minimum 1, maximum 2
+			int randScale = generator.nextInt(2) + 1; // minimum 1, maximum 2
 			int randX = generator.nextInt(8001)-4000; // minimum -4000, maximum 4000
 			int randY = generator.nextInt(8001)-4000; // minimum -4000, maximum 4000
 			boolean randTerrestrial = generator.nextBoolean();
@@ -84,8 +89,8 @@ public class World {
 			
 			for ( int i = 1; i <= randAmmountOfPlanets; i++ ) {
 				
-				int randX = generator.nextInt(101) + e.x();
-				int randY = generator.nextInt(101) + e.y();
+				int randX = generator.nextInt(1001) + e.x();
+				int randY = generator.nextInt(1001) + e.y();
 				int randTemp = generator.nextInt(451); // minimum 0, maximum 450 kelvin
 				int randScale = generator.nextInt(3) + 1; // minimum 1, maximum 2
 				boolean randTerrestrial = generator.nextBoolean();
@@ -107,6 +112,11 @@ public class World {
 		
 	}
 	
+	/**
+	 * 
+	 * @param window
+	 * @param g
+	 */
 	public void render( GameContainer window, Graphics g ) {
 		
 		for( Star e : allStars ) {
@@ -122,10 +132,30 @@ public class World {
 		}
 	}
 	
+	
+	/**
+	 * 
+	 * @param window
+	 * @param dt
+	 */
 	public void update( GameContainer window, int dt ) {
 		
 	}
 	
-		
+	/**
+	 * 
+	 * @return
+	 */
+	public ArrayList<Planet> returnPlanets() {
+		return this.allPlanets;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public ArrayList<Star> returnStars() {
+		return this.allStars;
+	}
 		
 }

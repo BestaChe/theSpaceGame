@@ -1,5 +1,7 @@
 package engine.main.entities;
 
+import java.util.ArrayList;
+
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
@@ -9,6 +11,7 @@ import org.newdawn.slick.SpriteSheet;
 import org.newdawn.slick.geom.Rectangle;
 
 import engine.main.Camera;
+import engine.main.world.World;
 
 public class Player {
 	
@@ -20,6 +23,8 @@ public class Player {
 	private Rectangle shape;
 	private Image image;
 	private SpriteSheet sSheet;
+	
+	public String worldDetails = "No Details";
 	
 	/**
 	 * Constructs the player class
@@ -47,11 +52,26 @@ public class Player {
 	 * @param window - GameContainer window
 	 * @param dt - int delta time
 	 */
-	public void update( GameContainer window, int dt, Camera cam ) {
+	public void update( GameContainer window, int dt, Camera cam, World world ) {
 		
 		// controls bitch
 		this.controls(window, dt, cam);
 		this.image.setRotation( (float)rotation );
+		
+		ArrayList<Planet> allPlanets = world.returnPlanets();
+		ArrayList<Star> allStars = world.returnStars();
+		
+		for( Star s : allStars ) {
+			
+			if ( s.shape().contains( this.x, this.y ) )
+				worldDetails = s.details();
+		}
+		
+		for( Planet p : allPlanets ) {
+			
+			if ( p.shape().contains( this.x, this.y ) )
+				worldDetails = p.details();
+		}
 		
 	}
 	
@@ -64,6 +84,7 @@ public class Player {
 		
 		// draws the player
 		g.drawImage( this.image, this.x-image.getWidth()/2, this.y-image.getHeight()/2 );
+
 	}
 	
 	/**
@@ -86,11 +107,26 @@ public class Player {
 		
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public float x() {
 		return this.x;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public float y() {
 		return this.y;
 	}
+	
+	public String worldDetails() {
+		return this.worldDetails;
+	}
+	
+	
+	
 }

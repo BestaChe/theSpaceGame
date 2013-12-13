@@ -72,4 +72,14 @@ public class Star extends AstronomicalObject {
 	public int planetCount() {
 		return this.childs.size();
 	}
+	
+	public String details() {
+		StringBuilder str = new StringBuilder();
+		
+		str.append("Name: " + this.name + "\n" );
+		str.append("Temperature: " + this.temperature + "K\n");
+		str.append("Child Planets: " + this.planetCount() );
+		
+		return str.toString();
+	}
 }

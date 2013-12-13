@@ -58,5 +58,14 @@ public class Planet extends AstronomicalObject {
 		return this.scale();
 	}
 	
+	public String details() {
+		StringBuilder str = new StringBuilder();
+		
+		str.append("Name: " + this.name + "\n" );
+		str.append("Is terrestrian: " + this.terrestrian + "\n" );
+		str.append("Temperature: " + this.temperature + "K");
+		
+		return str.toString();
+	}
 
 }

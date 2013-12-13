@@ -49,22 +49,25 @@ public class GameState_Playing extends BasicGameState {
 	public void update(GameContainer window, StateBasedGame game, int dt)
 			throws SlickException {
 		
+		
 		camera.centerOn(player.x(), player.y());
 		world.update(window, dt);
-		player.update(window, dt, camera);
+		player.update(window, dt, camera, world );
 		
 	}
 
 	public void render(GameContainer window, StateBasedGame game, Graphics g)
 			throws SlickException {
 		
-		g.drawString("Game State: " + ID, 20, 50 );
-		
 		camera.translateGraphics();
 		world.render(window, g);
 		
 		player.render( window, g );
 		camera.untranslateGraphics();
+		
+		g.drawString("Game State: " + ID, 20, 50 );
+		g.drawString(player.worldDetails(), 20, 80);
+		
 		
 	}
 	
