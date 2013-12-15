@@ -46,7 +46,7 @@ public class Player {
 		this.acceleration = 0.4;
 		
 		this.sSheet = new SpriteSheet("gfx/sprite_ships_small.png", 32, 32);
-		this.image = sSheet.getSubImage(1,0);
+		this.image = sSheet.getSubImage(3,0);
 		this.image.setRotation( (float)rotation );
 		this.shape = new Rectangle(x-16, y-16, y+16, y+16);
 		
@@ -94,7 +94,15 @@ public class Player {
 		
 		if ( window.getInput().isKeyPressed(Input.KEY_W) || window.getInput().isKeyDown(Input.KEY_W)) {
 			
-			if ( this.velocity < 8.0 )
+			double maxVelocity = 8.0; 
+			
+			if ( window.getInput().isKeyPressed(Input.KEY_LSHIFT) || window.getInput().isKeyDown(Input.KEY_LSHIFT) ) {
+				maxVelocity = 14.0;
+			}
+			else
+				maxVelocity = 8.0;
+			
+			if ( this.velocity < maxVelocity )
 				this.velocity += this.acceleration;
 			
 			this.x += Math.sin( Math.toRadians(this.rotation)-Math.PI/2 )*velocity;
