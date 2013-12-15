@@ -41,7 +41,7 @@ public class Player {
 		this.acceleration = 0.1;
 		
 		this.sSheet = new SpriteSheet("gfx/sprite_ships_small.png", 32, 32);
-		this.image = sSheet.getSubImage(0,0);
+		this.image = sSheet.getSubImage(1,0);
 		this.image.setRotation( (float)rotation );
 		this.shape = new Rectangle(x-16, y-16, y+16, y+16);
 		

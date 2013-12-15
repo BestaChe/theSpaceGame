@@ -1,7 +1,9 @@
 package engine.main.entities;
 
 import java.util.ArrayList;
+import java.util.Random;
 
+import org.newdawn.slick.Color;
 import org.newdawn.slick.Image;
 
 public class Star extends AstronomicalObject {
@@ -9,6 +11,8 @@ public class Star extends AstronomicalObject {
 	private String name;
 	private long temperature;
 	private ArrayList<Planet> childs;
+	
+	private Color starColor;
 	
 	/**
 	 * Constructs the Star Object
@@ -19,11 +23,33 @@ public class Star extends AstronomicalObject {
 	 * @param temperature - int kelvin temperature of the star
 	 */
 	public Star(String name, int x, int y, int scale, long temperature, Image image ) {
-		super(x, y, scale, image);
+		super(x, y, scale*4, image);
 		
 		this.name = name;
 		this.temperature = temperature;
 		this.childs = new ArrayList<Planet>();
+		
+		
+		// COLOR
+		Random rd = new Random();
+		long difference = Math.abs( this.temperature - 5778 );
+		int colInterval;
+		if (  difference <= 1000 ) {
+			colInterval = (int)Math.abs((rd.nextInt( (int)((difference/100) * 1.5 ) * 2 ) 
+					- difference/100 * 1.5));
+			
+			this.starColor = new Color(175+colInterval, 175+colInterval, 175+colInterval);
+		}
+		else
+		{
+			colInterval = (int)Math.abs(rd.nextInt( (int)(( this.temperature / 100 ) * 1.5 )));
+			if ( this.temperature < 4778 ) {
+				this.starColor = new Color(205+colInterval, 175-colInterval/2, 150-colInterval );
+			}
+			else {
+				this.starColor = new Color(150-colInterval, 175-colInterval/2, 205+colInterval );
+			}
+		}
 	}
 	
 	/**
@@ -47,7 +73,7 @@ public class Star extends AstronomicalObject {
 	 * @return int mass
 	 */
 	public int mass() {
-		return (int)Math.pow(2, this.scale() );
+		return (int)Math.pow(Math.E, this.scale() );
 	}
 	
 	/**
@@ -72,14 +98,26 @@ public class Star extends AstronomicalObject {
 	public int planetCount() {
 		return this.childs.size();
 	}
-	
+	/**
+	 * 
+	 * @return
+	 */
 	public String details() {
 		StringBuilder str = new StringBuilder();
 		
 		str.append("Name: " + this.name + "\n" );
+		str.append("Mass: " + this.mass() + " times the mass of the sun\n");
 		str.append("Temperature: " + this.temperature + "K\n");
 		str.append("Child Planets: " + this.planetCount() );
 		
 		return str.toString();
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public Color color() {
+		return this.starColor;
 	}
 }

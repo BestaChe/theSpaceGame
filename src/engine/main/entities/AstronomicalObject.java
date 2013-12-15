@@ -3,7 +3,9 @@ import org.newdawn.slick.Image;
 import org.newdawn.slick.geom.Circle;
 
 public class AstronomicalObject {
-
+	
+	public static final int ASTRO_IMAGE_SIZE = 128;
+	
 	private int x;
 	private int y;
 	private int scale;
@@ -21,7 +23,7 @@ public class AstronomicalObject {
 		this.x = x;
 		this.y = y;
 		this.scale = scale;
-		this.shape = new Circle( x, y, scale*64 );
+		this.shape = new Circle( x, y, (int)(scale*( AstronomicalObject.ASTRO_IMAGE_SIZE /4.0) ) );
 		this.image = image;
 	}
 	

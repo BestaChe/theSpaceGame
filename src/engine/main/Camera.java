@@ -4,25 +4,6 @@ import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.geom.Shape;
 
 public class Camera {
-
-   
-   /** the number of tiles in x-direction (width) */
-   protected int numTilesX;
-   
-   /** the number of tiles in y-direction (height) */
-   protected int numTilesY;
-   
-   /** the height of the map in pixel */
-   protected int mapHeight;
-   
-   /** the width of the map in pixel */
-   protected int mapWidth;
-   
-   /** the width of one tile of the map in pixel */
-   protected int tileWidth;
-   
-   /** the height of one tile of the map in pixel */
-   protected int tileHeight;
    
    /** the GameContainer, used for getting the size of the GameCanvas */
    protected GameContainer gc;
@@ -33,15 +14,19 @@ public class Camera {
    /** the y-position of our "camera" in pixel */
    protected float cameraY;
    
+   /** the parallax constant of the camera */
+   protected double parallaxConstant;
+   
    /**
     * Create a new camera
     * 
     * @param gc the GameContainer, used for getting the size of the GameCanvas
     * @param map the TiledMap used for the current scene
     */
-   public Camera(GameContainer gc) {
+   public Camera(GameContainer gc, int layer) {
       
       this.gc = gc;
+      this.parallaxConstant = 1 /((layer + 1)*1.0);
    }
    
    /**
@@ -81,14 +66,14 @@ public class Camera {
     * can be drawn with it's NATURAL coordinates.
     */
    public void translateGraphics() {
-      gc.getGraphics().translate(-cameraX, -cameraY);
+	   gc.getGraphics().translate((float)(-(cameraX)*parallaxConstant), (float)(-(cameraY)*parallaxConstant));
    }
    /**
     * Reverses the Graphics-translation of Camera.translatesGraphics().
     * Call this before drawing HUD-elements or the like
     */
    public void untranslateGraphics() {
-      gc.getGraphics().translate(cameraX, cameraY);
+	   gc.getGraphics().translate((float)((cameraX)*parallaxConstant), (float)((cameraY)*parallaxConstant));
    }
    
    public float camX() {

@@ -62,6 +62,7 @@ public class Planet extends AstronomicalObject {
 		StringBuilder str = new StringBuilder();
 		
 		str.append("Name: " + this.name + "\n" );
+		str.append("Mass: " + this.mass() + " times the mass of the Earth\n");
 		str.append("Is terrestrian: " + this.terrestrian + "\n" );
 		str.append("Temperature: " + this.temperature + "K");
 		
