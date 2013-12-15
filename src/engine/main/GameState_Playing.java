@@ -9,6 +9,7 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Circle;
+import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 
@@ -32,7 +33,7 @@ public class GameState_Playing extends BasicGameState {
 	private World world = new World( "DEFAULT", 0.9 );
 	
 	// CAMERA
-	private static final int MAX_PARALLAX_SPRITES = 120;
+	private static final int MAX_PARALLAX_SPRITES = 60;
 	private Camera camera[] = new Camera[4];
 	private ArrayList<Circle> parallax;
 	private ArrayList<Circle> parallax2;
@@ -88,27 +89,28 @@ public class GameState_Playing extends BasicGameState {
 		g.drawImage( new Image("gfx/background.png"), 0, 0 );
 		
 		camera[3].translateGraphics();
-		this.drawParallaxStars(window, g, 3);
+		this.drawParallaxStars(window, g, 3, player);
 		camera[3].untranslateGraphics();
 		
 		camera[2].translateGraphics();
-		this.drawParallaxStars(window, g, 2);
+		this.drawParallaxStars(window, g, 2, player);
 		camera[2].untranslateGraphics();
 		
 		camera[1].translateGraphics();
-		this.drawParallaxStars(window, g, 1);
+		this.drawParallaxStars(window, g, 1, player);
 		camera[1].untranslateGraphics();
 		
 		// WORLD MAIN STUFF
 		camera[0].translateGraphics();
-		world.render(window, g);
+		world.render(window, g, player);
 		
 		player.render( window, g );
 		camera[0].untranslateGraphics();
 		
+		g.setColor(new Color( 0 , 0, 0, 125) );
+		g.fill( new Rectangle( 0, 0, 400, 150 ) );
 		g.setColor( new Color( 255, 255, 125, 255) );
-		g.drawString("Game State: " + ID, 20, 50 );
-		g.drawString(player.worldDetails(), 20, 80);
+		g.drawString(player.worldDetails(), 20, 30);
 		g.setColor( new Color( 255, 255, 255, 255) );
 		
 	}
@@ -159,7 +161,7 @@ public class GameState_Playing extends BasicGameState {
 	 * @param g - Graphics
 	 * @param layer - layer of the stars 1, 2 or 3
 	 */
-	public void drawParallaxStars( GameContainer window, Graphics g, int layer ) {
+	public void drawParallaxStars( GameContainer window, Graphics g, int layer, Player player ) {
 		
 		switch( layer ) {
 		case 1:

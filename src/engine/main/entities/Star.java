@@ -35,19 +35,17 @@ public class Star extends AstronomicalObject {
 		long difference = Math.abs( this.temperature - 5778 );
 		int colInterval;
 		if (  difference <= 1000 ) {
-			colInterval = (int)Math.abs((rd.nextInt( (int)((difference/100) * 1.5 ) * 2 ) 
-					- difference/100 * 1.5));
-			
-			this.starColor = new Color(175+colInterval, 175+colInterval, 175+colInterval);
+			this.starColor = new Color(255, 255, 255);
 		}
 		else
 		{
-			colInterval = (int)Math.abs(rd.nextInt( (int)(( this.temperature / 100 ) * 1.5 )));
 			if ( this.temperature < 4778 ) {
-				this.starColor = new Color(205+colInterval, 175-colInterval/2, 150-colInterval );
+				colInterval = (int)Math.abs(rd.nextInt( (int)(( this.temperature/100)+15)));
+				this.starColor = new Color( 255 , 255 - colInterval, 255 - colInterval );
 			}
 			else {
-				this.starColor = new Color(150-colInterval, 175-colInterval/2, 205+colInterval );
+				colInterval = (int)Math.abs(rd.nextInt( (int)(( this.temperature/100))));
+				this.starColor = new Color( 255 - colInterval, 255 - colInterval, 255 );
 			}
 		}
 	}

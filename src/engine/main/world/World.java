@@ -9,8 +9,10 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 
+import engine.main.Camera;
 import engine.main.Util;
 import engine.main.entities.Planet;
+import engine.main.entities.Player;
 import engine.main.entities.Star;
 
 public class World {
@@ -63,7 +65,7 @@ public class World {
 			int randScale = generator.nextInt(4) + 1; // minimum 1, maximum 6
 			randX = generator.nextInt(6001)-3000; // minimum -3000, maximum 3000
 			randY = generator.nextInt(6001)-3000; // minimum -3000, maximum 3000
-			Image starImage = new Image( "gfx/star_1.png");
+			Image starImage = new Image( "gfx/star_1.png" );
 			
 			Star current = new Star( Names.generateStarName(generator), randX, randY, 
 					randScale, randTemp, starImage );
@@ -71,7 +73,7 @@ public class World {
 			if ( this.allStars.size() > 1 ) {
 				Star closest = closestStar( current );
 				
-				if ( Util.dist(closest.x(), closest.y() , current.x(), current.y()) < current.scale()*32 + 1000.0 ) {
+				if ( Util.dist(closest.x(), closest.y() , current.x(), current.y()) < current.scale()*32*4 + 1000.0 ) {
 					randX = randX*generator.nextInt(3)+1;
 					randY = randY*generator.nextInt(3)+1;
 					current = new Star( Names.generateStarName(generator), randX, randY, 
@@ -94,14 +96,18 @@ public class World {
 			int randX = generator.nextInt(8001)-4000; // minimum -4000, maximum 4000
 			int randY = generator.nextInt(8001)-4000; // minimum -4000, maximum 4000
 			boolean randTerrestrial = generator.nextBoolean();
+			boolean atmos = generator.nextBoolean();
 			Image planetImage;
+			
 			if ( randTerrestrial )
 				planetImage = new Image( "gfx/terr_planet_base_1.png");
 			else
 				planetImage = new Image( "gfx/gas_planet_base_1.png");
 			
-			this.allPlanets.add( new Planet( Names.generatePlanetName(generator), randX, randY, 
-					randScale, randTerrestrial, randTemp, planetImage ));
+			Planet current = new Planet( Names.generatePlanetName(generator), randX, randY, 
+					randScale, randTerrestrial, randTemp, atmos, planetImage );
+			
+			this.allPlanets.add( current );
 			
 			countPlanets++;
 			
@@ -110,7 +116,7 @@ public class World {
 		// make child planets
 		for ( Star e : this.allStars ) {
 			
-			int randAmmountOfPlanets = generator.nextInt(World.MAX_PLANETS_PER_STAR + 1) + 1;
+			int randAmmountOfPlanets = generator.nextInt(World.MAX_PLANETS_PER_STAR + 1);
 			
 			for ( int i = 1; i <= randAmmountOfPlanets; i++ ) {
 				
@@ -121,20 +127,22 @@ public class World {
 				int randTemp = generator.nextInt(451); // minimum 0, maximum 450 kelvin
 				int randScale = generator.nextInt(2) + 1; // minimum 1, maximum 2
 				boolean randTerrestrial = generator.nextBoolean();
+				boolean atmos = generator.nextBoolean();
 				Image planetImage;
 				if ( randTerrestrial )
 					planetImage = new Image( "gfx/terr_planet_base_1.png");
 				else
 					planetImage = new Image( "gfx/gas_planet_base_1.png");
+				
 				Planet current = new Planet( Names.generatePlanetName(e, generator), randX, randY, 
-						randScale, randTerrestrial, randTemp, planetImage );
+						randScale, randTerrestrial, randTemp, atmos, planetImage );
 				
 				
 				if ( Util.dist(e.x(), e.y(), current.x(), current.y()) < ( e.scale()*32 ) ) {
 					randX = (generator.nextInt(501) + e.x())*e.scale();
 					randY = (generator.nextInt(501) + e.y())*e.scale();
 					current = new Planet( Names.generatePlanetName(e, generator), randX+( e.scale()*32 ) + 50, randY+( e.scale()*32 ) + 50, 
-							randScale, randTerrestrial, randTemp, planetImage );
+							randScale, randTerrestrial, randTemp, atmos, planetImage );
 				}
 				
 				if ( i > 1 ) {
@@ -143,7 +151,7 @@ public class World {
 					randY = generator.nextInt(2001) + e.y() - 1000;
 					if ( Util.dist(closest.x(), closest.y(), current.x() , current.y()) < 200.0 )
 						current = new Planet( Names.generatePlanetName(e, generator), randX, randY, 
-								randScale, randTerrestrial, randTemp, planetImage );
+								randScale, randTerrestrial, randTemp, atmos, planetImage );
 				}
 				
 				e.addPlanet( current );
@@ -166,28 +174,60 @@ public class World {
 	 * 
 	 * @param window
 	 * @param g
+	 * @throws SlickException 
 	 */
-	public void render( GameContainer window, Graphics g ) {
+	public void render( GameContainer window, Graphics g, Player player) {
 		
 		// draw stars
 		g.setColor(new Color(255,255,255,255));
 		
 		for( Star e : allStars ) {
-			g.setColor(e.color());
-			g.fill(e.shape());
-			Image scaledImage = e.image().getScaledCopy( e.scale() );
-			scaledImage.setImageColor(e.color().getRed(), e.color().getGreen(), e.color().getBlue());
-			g.drawImage( scaledImage, e.x() - scaledImage.getWidth()/2, e.y() - scaledImage.getHeight()/2 );
+
+			if( Util.dist(e.x(), e.y(), player.x(), player.y()) < 1980.0 ) {
+				g.setColor(e.color());
+				g.fill(e.shape());
+				Image scaledImage = e.image().getScaledCopy( e.scale() );
+				g.drawImage( scaledImage, e.x() - scaledImage.getWidth()/2, e.y() - scaledImage.getHeight()/2, e.color() );
+			}
 		}
-		
+
 		g.setColor(new Color(255,255,255,255));
-		
+
 		// draw planets
 		for( Planet p : allPlanets ) {
-			g.setColor(new Color(150,150,150,0));
-			g.fill(p.shape());
-			Image scaledImage = p.image().getScaledCopy( (float)Math.ceil(p.scale()/2.0) );
-			g.drawImage( scaledImage, p.x() - scaledImage.getWidth()/2, p.y() - scaledImage.getHeight()/2 );
+
+			if( Util.dist(p.x(), p.y(), player.x(), player.y()) < 1980.0 ) {
+				g.setColor(p.color());
+				g.fill(p.shape());
+				Image scaledImage = p.image().getScaledCopy( (float)Math.ceil(p.scale()/2.0) );
+				g.drawImage( scaledImage, p.x() - scaledImage.getWidth()/2, p.y() - scaledImage.getHeight()/2, p.color() );
+
+				if ( p.hasDetail() && p.isTerrestrian() ) {
+					try {
+
+						Image detailImage;
+						detailImage = new Image( p.detail() ).getScaledCopy( (float)Math.ceil(p.scale()/2.0) );
+						g.drawImage( detailImage, p.x() - detailImage.getWidth()/2, p.y() - detailImage.getHeight()/2 );
+
+					} catch (SlickException e1) {
+
+						e1.printStackTrace();
+					}
+				}
+
+				if ( p.hasAtmosphere() ) {
+					try {
+
+						Image atmosImage;
+						atmosImage = new Image( "gfx/terr_planet_atmosphere_1.png" ).getScaledCopy( (float)Math.ceil(p.scale()/2.0) );
+						g.drawImage( atmosImage, p.x() - atmosImage.getWidth()/2, p.y() - atmosImage.getHeight()/2 );
+
+					} catch (SlickException e1) {
+
+						e1.printStackTrace();
+					}
+				}
+			}
 		}
 		
 		g.setColor(new Color(255,255,255,255));

@@ -34,7 +34,8 @@ public class MainClass extends StateBasedGame {
 		AppGameContainer window = new AppGameContainer( new MainClass(MainClass.GAME_NAME) );
 		
 		window.setDisplayMode( MainClass.WINDOW_WIDTH, MainClass.WINDOW_HEIGHT, MainClass.WINDOW_FULLSCREEN );
-		window.setAlwaysRender( true );
+		window.setTargetFrameRate( 60 );
+		window.setAlwaysRender( false );
 		window.start();
 		
 	}

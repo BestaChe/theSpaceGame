@@ -11,6 +11,7 @@ import org.newdawn.slick.SpriteSheet;
 import org.newdawn.slick.geom.Rectangle;
 
 import engine.main.Camera;
+import engine.main.particles.ShipParticle;
 import engine.main.world.World;
 
 public class Player {
@@ -23,6 +24,9 @@ public class Player {
 	private Rectangle shape;
 	private Image image;
 	private SpriteSheet sSheet;
+	private ShipParticle particle;
+	
+	private boolean controlPressed;
 	
 	public String worldDetails = "No Details";
 	
@@ -37,13 +41,18 @@ public class Player {
 		this.x = x;
 		this.y = y;
 		this.rotation = 0.0;
-		this.velocity = 0.4;
-		this.acceleration = 0.1;
+		
+		this.velocity = 0.0;
+		this.acceleration = 0.4;
 		
 		this.sSheet = new SpriteSheet("gfx/sprite_ships_small.png", 32, 32);
 		this.image = sSheet.getSubImage(1,0);
 		this.image.setRotation( (float)rotation );
 		this.shape = new Rectangle(x-16, y-16, y+16, y+16);
+		
+		this.particle = new ShipParticle("gfx/particles/ship_particle_yellow.png");
+		
+		this.controlPressed = false;
 		
 		
 	}
@@ -54,8 +63,6 @@ public class Player {
 	 */
 	public void update( GameContainer window, int dt, Camera cam, World world ) {
 		
-		// controls bitch
-		this.controls(window, dt, cam);
 		this.image.setRotation( (float)rotation );
 		
 		ArrayList<Planet> allPlanets = world.returnPlanets();
@@ -73,6 +80,47 @@ public class Player {
 				worldDetails = p.details();
 		}
 		
+		//this.particle.update(dt);
+		
+		
+		/**
+		 * 
+		 *  CONTROLS
+		 * 
+		 *  
+		 */
+		
+		this.rotation = Math.toDegrees(Math.atan2((this.y-window.getInput().getMouseY())-cam.camY(),(this.x-window.getInput().getMouseX())-cam.camX()));
+		
+		if ( window.getInput().isKeyPressed(Input.KEY_W) || window.getInput().isKeyDown(Input.KEY_W)) {
+			
+			if ( this.velocity < 8.0 )
+				this.velocity += this.acceleration;
+			
+			this.x += Math.sin( Math.toRadians(this.rotation)-Math.PI/2 )*velocity;
+			this.y -= Math.cos( Math.toRadians(this.rotation)-Math.PI/2 )*velocity;
+			this.controlPressed = true;
+		}
+		
+		else if( window.getInput().isKeyPressed(Input.KEY_S) || window.getInput().isKeyDown(Input.KEY_S)) {
+			if ( this.velocity > 0.0 ) {
+				this.velocity -= this.acceleration;
+				this.x += Math.sin( Math.toRadians(this.rotation)-Math.PI/2 )*velocity;
+				this.y -= Math.cos( Math.toRadians(this.rotation)-Math.PI/2 )*velocity;
+			}
+			else
+				this.velocity = 0.0;
+		}
+		else
+		{
+			if ( this.velocity > 0.0 )
+				this.velocity -= this.acceleration*0.1;
+			
+			this.x += Math.sin( Math.toRadians(this.rotation)-Math.PI/2 )*velocity;
+			this.y -= Math.cos( Math.toRadians(this.rotation)-Math.PI/2 )*velocity;
+			this.controlPressed = false;
+		}
+		
 	}
 	
 	/**
@@ -82,6 +130,8 @@ public class Player {
 	 */
 	public void render( GameContainer window, Graphics g ) {
 		
+		// particles
+		//this.particle.render();
 		// draws the player
 		g.drawImage( this.image, this.x-image.getWidth()/2, this.y-image.getHeight()/2 );
 
@@ -92,20 +142,6 @@ public class Player {
 	 * @param window - GameContainer window
 	 * @param dt - int delta time
 	 */
-	public void controls( GameContainer window, int dt, Camera cam ) {
-		
-		this.rotation = Math.toDegrees(Math.atan2((this.y-window.getInput().getMouseY())-cam.camY(),(this.x-window.getInput().getMouseX())-cam.camX()));
-		
-		if ( window.getInput().isKeyPressed(Input.KEY_W) || window.getInput().isKeyDown(Input.KEY_W)) {
-			
-			this.velocity += acceleration * dt;
-			this.x += Math.sin( Math.toRadians(this.rotation)-Math.PI/2 )*velocity;
-			this.y -= Math.cos( Math.toRadians(this.rotation)-Math.PI/2 )*velocity;
-		}
-		this.velocity = 0.4;
-		
-		
-	}
 	
 	/**
 	 * 
