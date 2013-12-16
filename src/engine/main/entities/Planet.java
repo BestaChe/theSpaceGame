@@ -28,7 +28,7 @@ public class Planet extends AstronomicalObject {
 	public Planet(String name, int x, int y, int scale, boolean terrestrian, int temperature, 
 			boolean hasAtmosphere, Image image) {
 		
-		super(x, y, scale, image);
+		super(x, y, scale*2, image);
 		
 		this.name = name;
 		this.terrestrian = terrestrian;
@@ -154,5 +154,5 @@ public class Planet extends AstronomicalObject {
 		
 		return str.toString();
 	}
-
+	
 }

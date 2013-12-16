@@ -67,4 +67,14 @@ public class AstronomicalObject {
 		return this.image;
 	}
 	
+	/**
+	 * 
+	 * @param x
+	 * @param y
+	 */
+	public void setPosition( int x, int y ) {
+		this.x = x;
+		this.y = y;
+	}
+	
 }

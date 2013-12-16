@@ -26,6 +26,7 @@ public class World {
 	
 	private ArrayList<Planet> allPlanets;
 	private ArrayList<Star> allStars;
+	private ArrayList<SolarSystem> allSolarSystems;
 	
 	private Random generator = new Random();
 	protected String worldDetails;
@@ -41,6 +42,8 @@ public class World {
 		
 		this.allPlanets = new ArrayList<Planet>();
 		this.allStars = new ArrayList<Star>();
+		
+		this.allSolarSystems = new ArrayList<SolarSystem>();
 	}
 	
 	/**
@@ -56,13 +59,13 @@ public class World {
 		int countPlanets = 0;
 		int countChilds = 0;
 		
-		// make stars
+		// make stars & solar systems
 		for ( int i = 1; i <= numberOfStars; i++ ) {
 			
 			int randX;
 			int randY;
 			int randTemp = generator.nextInt(10001) + 2000; // minimum 2000, maximum 10000 kelvin
-			int randScale = generator.nextInt(4) + 1; // minimum 1, maximum 6
+			int randScale = generator.nextInt(4) + 2; // minimum 1, maximum 6
 			randX = generator.nextInt(6001)-3000; // minimum -3000, maximum 3000
 			randY = generator.nextInt(6001)-3000; // minimum -3000, maximum 3000
 			Image starImage = new Image( "gfx/star_1.png" );
@@ -70,20 +73,78 @@ public class World {
 			Star current = new Star( Names.generateStarName(generator), randX, randY, 
 					randScale, randTemp, starImage );
 			
-			if ( this.allStars.size() > 1 ) {
-				Star closest = closestStar( current );
+			SolarSystem solarSys = new SolarSystem( Names.generateStarName(generator), current );
+			
+			int randAmmountOfPlanets = generator.nextInt(World.MAX_PLANETS_PER_STAR + 1);
+			
+			for ( int i1 = 1; i1 <= randAmmountOfPlanets; i1++ ) {
 				
-				if ( Util.dist(closest.x(), closest.y() , current.x(), current.y()) < current.scale()*32*4 + 1000.0 ) {
-					randX = randX*generator.nextInt(3)+1;
-					randY = randY*generator.nextInt(3)+1;
-					current = new Star( Names.generateStarName(generator), randX, randY, 
-							randScale, randTemp, starImage );
+				int randX1;
+				int randY1;
+				randX1 = generator.nextInt(2001) + current.x() - 1000;
+				randY1 = generator.nextInt(2001) + current.y() - 1000 ;
+				int randTemp1 = generator.nextInt(451); // minimum 0, maximum 450 kelvin
+				int randScale1 = generator.nextInt(2) + 1; // minimum 1, maximum 2
+				boolean randTerrestrial = generator.nextBoolean();
+				boolean atmos = generator.nextBoolean();
+				Image planetImage;
+				if ( randTerrestrial )
+					planetImage = new Image( "gfx/terr_planet_base_1.png");
+				else
+					planetImage = new Image( "gfx/gas_planet_base_1.png");
+				
+				Planet current1 = new Planet( Names.generatePlanetName(current, generator), randX1, randY1, 
+						randScale1, randTerrestrial, randTemp1, atmos, planetImage );
+				
+				int buffer = 0;
+				while( Util.dist(current.x(), current.y(), current1.x(), current1.y()) < ( current.scale()*32 + current1.scale()*16 ) ) {
+					
+					if ( buffer > 10000 ) 
+						break;
+					randX1 = (generator.nextInt(1501) + current.x())*current.scale();
+					randY1 = (generator.nextInt(1501) + current.y())*current.scale();
+					
+					current1 = new Planet( Names.generatePlanetName(current, generator), randX1+( current.scale()*32 ) + 50, 
+							randY1+( current.scale()*32 ) + 50, randScale1, randTerrestrial,
+							randTemp1, atmos, planetImage );
+					buffer++;
+				}
+				buffer = 0;
+				if ( i1 > 1 ) {
+					Planet closest = closestPlanet( current1 );
+					randX1 = generator.nextInt(2001) + current.x() - 1000;
+					randY1 = generator.nextInt(2001) + current.y() - 1000;
+					while( Util.dist(closest.x(), closest.y(), current1.x() , current1.y()) < 200.0 ) {
+						if ( buffer > 10000 )
+							break;
+						
+						current1 = new Planet( Names.generatePlanetName(current, generator), randX1, randY1, 
+								randScale1, randTerrestrial, randTemp1, atmos, planetImage );
+						buffer++;
+					}
+				}
+				
+				solarSys.addPlanet( current1 );
+				
+				countChilds++;
+				
+			}
+			
+			if ( this.allSolarSystems.size() > 2 ) {
+				for ( SolarSystem sys : allSolarSystems ) {
+					if( Util.dist( sys.x(), sys.y(), solarSys.x(), solarSys.y() ) < sys.size() ) {
+						
+						solarSys.setPosition(solarSys.x()+(int)sys.size(), solarSys.y()-(int)sys.size());
+						current = solarSys.getStar();
+					}
 				}
 			}
-
 			
+			for( Planet p : current.getChildPlanets())
+				this.allPlanets.add( p );
+			
+			this.allSolarSystems.add( solarSys );
 			this.allStars.add( current );
-			
 			countStars++;
 			
 		}
@@ -91,7 +152,7 @@ public class World {
 		// make orphan planets
 		for ( int i = 1; i <= numberOfPlanets; i++ ) {
 			
-			int randTemp = generator.nextInt(451); // minimum 0, maximum 450 kelvin
+			int randTemp = generator.nextInt(451)+1; // minimum 0, maximum 450 kelvin
 			int randScale = generator.nextInt(2) + 1; // minimum 1, maximum 2
 			int randX = generator.nextInt(8001)-4000; // minimum -4000, maximum 4000
 			int randY = generator.nextInt(8001)-4000; // minimum -4000, maximum 4000
@@ -110,57 +171,6 @@ public class World {
 			this.allPlanets.add( current );
 			
 			countPlanets++;
-			
-		}
-		
-		// make child planets
-		for ( Star e : this.allStars ) {
-			
-			int randAmmountOfPlanets = generator.nextInt(World.MAX_PLANETS_PER_STAR + 1);
-			
-			for ( int i = 1; i <= randAmmountOfPlanets; i++ ) {
-				
-				int randX;
-				int randY;
-				randX = generator.nextInt(2001) + e.x() - 1000;
-				randY = generator.nextInt(2001) + e.y() - 1000 ;
-				int randTemp = generator.nextInt(451); // minimum 0, maximum 450 kelvin
-				int randScale = generator.nextInt(2) + 1; // minimum 1, maximum 2
-				boolean randTerrestrial = generator.nextBoolean();
-				boolean atmos = generator.nextBoolean();
-				Image planetImage;
-				if ( randTerrestrial )
-					planetImage = new Image( "gfx/terr_planet_base_1.png");
-				else
-					planetImage = new Image( "gfx/gas_planet_base_1.png");
-				
-				Planet current = new Planet( Names.generatePlanetName(e, generator), randX, randY, 
-						randScale, randTerrestrial, randTemp, atmos, planetImage );
-				
-				
-				if ( Util.dist(e.x(), e.y(), current.x(), current.y()) < ( e.scale()*32 ) ) {
-					randX = (generator.nextInt(501) + e.x())*e.scale();
-					randY = (generator.nextInt(501) + e.y())*e.scale();
-					current = new Planet( Names.generatePlanetName(e, generator), randX+( e.scale()*32 ) + 50, randY+( e.scale()*32 ) + 50, 
-							randScale, randTerrestrial, randTemp, atmos, planetImage );
-				}
-				
-				if ( i > 1 ) {
-					Planet closest = closestPlanet( current );
-					randX = generator.nextInt(2001) + e.x() - 1000;
-					randY = generator.nextInt(2001) + e.y() - 1000;
-					if ( Util.dist(closest.x(), closest.y(), current.x() , current.y()) < 200.0 )
-						current = new Planet( Names.generatePlanetName(e, generator), randX, randY, 
-								randScale, randTerrestrial, randTemp, atmos, planetImage );
-				}
-				
-				e.addPlanet( current );
-				
-				for( Planet p : e.getChildPlanets())
-					this.allPlanets.add( p );
-				
-				countChilds++;
-			}
 			
 		}
 		
@@ -272,6 +282,21 @@ public class World {
 				closest = s;
 		}
 		
+		return closest;
+	}
+	
+	/**
+	 * 
+	 * @param a
+	 * @return
+	 */
+	public Star closestStar( Player a ) {
+		
+		Star closest = this.allStars.get(0);
+		for ( Star s : allStars ) {
+			if ( Util.dist( s.x(), a.x(), s.y(), a.y()) < Util.dist( closest.x(), a.x(), closest.y(), a.y()) )
+				closest = s;
+		}
 		return closest;
 	}
 	
