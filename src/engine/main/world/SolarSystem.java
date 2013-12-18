@@ -49,14 +49,34 @@ public class SolarSystem {
 		return this.star;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public int x() {
 		return this.x;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public int y() {
 		return this.y;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
+	public String name() {
+		return this.name;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
 	public double size() {
 		return this.size;
 	}
@@ -79,7 +99,7 @@ public class SolarSystem {
 		this.star.setPosition(x, y);
 		
 		for ( Planet p : solarPlanets ) {
-			p.setPosition(x, y);
+			p.setPosition(p.x() + x, p.y() + y);
 		}
 	}
 	

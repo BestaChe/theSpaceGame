@@ -36,13 +36,13 @@ public class Planet extends AstronomicalObject {
 		this.hasAtmosphere = hasAtmosphere;
 		this.planetColor = new Color(255, 255, 255);
 		
-		if ( this.temperature - 278 < 30 )
+		if ( Math.abs(this.temperature - 278) < 30 )
 			this.detail = 1;
 		
-		else if ( this.temperature > 308 )
+		else if ( Math.abs(this.temperature) > 308 )
 			this.detail = 2;
 
-		else if ( this.temperature < 248 )
+		else if ( Math.abs(this.temperature) < 248 )
 			this.detail = 3;
 		else
 			this.detail = 0;
@@ -120,6 +120,14 @@ public class Planet extends AstronomicalObject {
 	 */
 	public boolean hasDetail() {
 		return ( this.detail > 0 ? true : false );
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean supportsLife() {
+		return ( Math.abs(this.temperature - (long)278) < (long)30 && this.hasAtmosphere && this.terrestrian );
 	}
 	
 	/**

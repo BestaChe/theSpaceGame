@@ -14,6 +14,7 @@ import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 
 import engine.main.entities.Player;
+import engine.main.gui.HealthBar;
 import engine.main.world.World;
 
 public class GameState_Playing extends BasicGameState {
@@ -30,14 +31,17 @@ public class GameState_Playing extends BasicGameState {
 	private Player player;
 	
 	// WORLD
-	private World world = new World( "DEFAULT", 0.9 );
+	private World world = new World( "DEFAULT", 0.7 );
 	
 	// CAMERA
-	private static final int MAX_PARALLAX_SPRITES = 60;
+	private static final int MAX_PARALLAX_SPRITES = 800;
 	private Camera camera[] = new Camera[4];
 	private ArrayList<Circle> parallax;
 	private ArrayList<Circle> parallax2;
 	private ArrayList<Circle> parallax3;
+	
+	// GUI
+	private HealthBar guiHealth;
 	
 	/**
 	 * 
@@ -62,6 +66,12 @@ public class GameState_Playing extends BasicGameState {
 		
 		for ( int i = 1; i <= GameState_Playing.MAX_PARALLAX_SPRITES/3; i++ )
 			generateParallaxStars( window, player );
+		
+		/*
+		 * GUI
+		 */
+		
+		guiHealth = new HealthBar(new Image( "gui/gui_health.png" ), window.getWidth() - 150, 10, player );
 	}
 	
 	public void update(GameContainer window, StateBasedGame game, int dt)
@@ -74,7 +84,7 @@ public class GameState_Playing extends BasicGameState {
 		camera[3].centerOn(player.x(), player.y());
 		
 		
-		world.update(window, dt);
+		world.update(window, dt, player);
 		player.update(window, dt, camera[0], world );
 		
 		//for ( Circle a : parallax )
@@ -107,11 +117,16 @@ public class GameState_Playing extends BasicGameState {
 		player.render( window, g );
 		camera[0].untranslateGraphics();
 		
+		/*
+		 * GUI
+		 */
 		g.setColor(new Color( 0 , 0, 0, 125) );
 		g.fill( new Rectangle( 0, 0, 400, 150 ) );
 		g.setColor( new Color( 255, 255, 125, 255) );
 		g.drawString(player.worldDetails(), 20, 30);
 		g.setColor( new Color( 255, 255, 255, 255) );
+		
+		guiHealth.render(window, g, player);
 		
 	}
 	
@@ -137,15 +152,15 @@ public class GameState_Playing extends BasicGameState {
 			int wH = MainClass.WINDOW_HEIGHT;
 			int wW = MainClass.WINDOW_WIDTH;
 			
-			parallax.add( new Circle( player.x() + ( rd.nextInt(wW+1) - wW/2 ) 
+			parallax.add( new Circle( player.x() + ( rd.nextInt(wW+1) - wW/2 )*10 
 					, player.y() + ( rd.nextInt(wH+1) - wH/2 )*10
 					, rd.nextInt( 6 ) + 1 ));
 			
-			parallax2.add( new Circle( player.x() + ( rd.nextInt(wW+1) - wW/2 ) 
+			parallax2.add( new Circle( player.x() + ( rd.nextInt(wW+1) - wW/2 )*10 
 					, player.y() + ( rd.nextInt(wH+1) - wH/2 )*10
 					, rd.nextInt( 5 ) + 1 ));
 			
-			parallax3.add( new Circle( player.x() + ( rd.nextInt(wW+1) - wW/2 ) 
+			parallax3.add( new Circle( player.x() + ( rd.nextInt(wW+1) - wW/2 )*10 
 					, player.y() + ( rd.nextInt(wH+1) - wH/2 )*10
 					, rd.nextInt( 4 ) + 1 ));
 			

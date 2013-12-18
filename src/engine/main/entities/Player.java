@@ -63,7 +63,7 @@ public class Player {
 	 */
 	public void update( GameContainer window, int dt, Camera cam, World world ) {
 		
-		this.image.setRotation( (float)rotation );
+		this.image.setRotation( (float)this.rotation );
 		
 		ArrayList<Planet> allPlanets = world.returnPlanets();
 		ArrayList<Star> allStars = world.returnStars();
@@ -90,7 +90,8 @@ public class Player {
 		 *  
 		 */
 		
-		this.rotation = Math.toDegrees(Math.atan2((this.y-window.getInput().getMouseY())-cam.camY(),(this.x-window.getInput().getMouseX())-cam.camX()));
+		this.rotation = Math.toDegrees(Math.atan2((this.y-window.getInput().getMouseY())-cam.camY(),
+				(this.x-window.getInput().getMouseX())-cam.camX()));
 		
 		if ( window.getInput().isKeyPressed(Input.KEY_W) || window.getInput().isKeyDown(Input.KEY_W)) {
 			
@@ -105,8 +106,8 @@ public class Player {
 			if ( this.velocity < maxVelocity )
 				this.velocity += this.acceleration;
 			
-			this.x += Math.sin( Math.toRadians(this.rotation)-Math.PI/2 )*velocity;
-			this.y -= Math.cos( Math.toRadians(this.rotation)-Math.PI/2 )*velocity;
+			this.x += Math.sin( Math.toRadians(this.rotation)-Math.PI/2 )*this.velocity;
+			this.y -= Math.cos( Math.toRadians(this.rotation)-Math.PI/2 )*this.velocity;
 			this.controlPressed = true;
 		}
 		
@@ -128,6 +129,9 @@ public class Player {
 			this.y -= Math.cos( Math.toRadians(this.rotation)-Math.PI/2 )*velocity;
 			this.controlPressed = false;
 		}
+		
+		this.shape.setCenterX(this.x);
+		this.shape.setCenterY(this.y);
 		
 	}
 	

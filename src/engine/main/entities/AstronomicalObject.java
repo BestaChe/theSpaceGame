@@ -75,6 +75,8 @@ public class AstronomicalObject {
 	public void setPosition( int x, int y ) {
 		this.x = x;
 		this.y = y;
+		this.shape().setCenterX(x);
+		this.shape().setCenterY(y);
 	}
 	
 }

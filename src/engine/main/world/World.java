@@ -11,6 +11,7 @@ import org.newdawn.slick.SlickException;
 
 import engine.main.Camera;
 import engine.main.Util;
+import engine.main.entities.NPC;
 import engine.main.entities.Planet;
 import engine.main.entities.Player;
 import engine.main.entities.Star;
@@ -28,6 +29,8 @@ public class World {
 	private ArrayList<Star> allStars;
 	private ArrayList<SolarSystem> allSolarSystems;
 	
+	private ArrayList<NPC> allNPCs;
+	
 	private Random generator = new Random();
 	protected String worldDetails;
 	
@@ -44,6 +47,8 @@ public class World {
 		this.allStars = new ArrayList<Star>();
 		
 		this.allSolarSystems = new ArrayList<SolarSystem>();
+		
+		this.allNPCs = new ArrayList<NPC>();
 	}
 	
 	/**
@@ -55,97 +60,136 @@ public class World {
 		int numberOfStars = (int)((World.MAX_STARS * this.density)+0.5);
 		int numberOfPlanets = (int)((World.MAX_PLANETS_ALONE * this.density)+0.5);
 		
+		int distanceFactor = 5;
+		
 		int countStars = 0;
 		int countPlanets = 0;
 		int countChilds = 0;
+		int countSystems = 0;
 		
 		// make stars & solar systems
 		for ( int i = 1; i <= numberOfStars; i++ ) {
 			
 			int randX;
 			int randY;
+			String randName = Names.generateStarName(generator);
 			int randTemp = generator.nextInt(10001) + 2000; // minimum 2000, maximum 10000 kelvin
 			int randScale = generator.nextInt(4) + 2; // minimum 1, maximum 6
-			randX = generator.nextInt(6001)-3000; // minimum -3000, maximum 3000
-			randY = generator.nextInt(6001)-3000; // minimum -3000, maximum 3000
+			randX = generator.nextInt(1001 * distanceFactor)-(int)(1000/(distanceFactor*1.0));
+			randY = generator.nextInt(1001 * distanceFactor)-(int)(1000/(distanceFactor*1.0)); 
 			Image starImage = new Image( "gfx/star_1.png" );
 			
-			Star current = new Star( Names.generateStarName(generator), randX, randY, 
-					randScale, randTemp, starImage );
+			Star current = new Star( randName , randX, randY, randScale, randTemp, starImage );
 			
-			SolarSystem solarSys = new SolarSystem( Names.generateStarName(generator), current );
+			SolarSystem solarSys = new SolarSystem( randName, current );
 			
 			int randAmmountOfPlanets = generator.nextInt(World.MAX_PLANETS_PER_STAR + 1);
 			
-			for ( int i1 = 1; i1 <= randAmmountOfPlanets; i1++ ) {
+			for ( int p = 1; p <= randAmmountOfPlanets; p++ ) {
 				
-				int randX1;
-				int randY1;
-				randX1 = generator.nextInt(2001) + current.x() - 1000;
-				randY1 = generator.nextInt(2001) + current.y() - 1000 ;
-				int randTemp1 = generator.nextInt(451); // minimum 0, maximum 450 kelvin
-				int randScale1 = generator.nextInt(2) + 1; // minimum 1, maximum 2
+				int randXP;
+				int randYP;
+				randXP = generator.nextInt(2001) + current.x() - 1000;
+				randYP = generator.nextInt(2001) + current.y() - 1000 ;
+				int randTempP = generator.nextInt(451); // minimum 0, maximum 450 kelvin
+				int randScaleP = generator.nextInt(2) + 1; // minimum 1, maximum 2
 				boolean randTerrestrial = generator.nextBoolean();
-				boolean atmos = generator.nextBoolean();
+				boolean randAtmos = generator.nextBoolean();
 				Image planetImage;
 				if ( randTerrestrial )
 					planetImage = new Image( "gfx/terr_planet_base_1.png");
 				else
 					planetImage = new Image( "gfx/gas_planet_base_1.png");
 				
-				Planet current1 = new Planet( Names.generatePlanetName(current, generator), randX1, randY1, 
-						randScale1, randTerrestrial, randTemp1, atmos, planetImage );
+				Planet currentplanet = new Planet( Names.generatePlanetName(current, generator), randXP, randYP, 
+						randScaleP, randTerrestrial, randTempP, randAtmos, planetImage );
 				
 				int buffer = 0;
-				while( Util.dist(current.x(), current.y(), current1.x(), current1.y()) < ( current.scale()*32 + current1.scale()*16 ) ) {
+				
+				/*
+				 *  // distance between planet and star
+				 */
+				while( Util.dist(current.x(), current.y(), currentplanet.x(), currentplanet.y()) 
+						< ( current.scale()*32 + currentplanet.scale()*16 ) ) {
 					
 					if ( buffer > 10000 ) 
 						break;
-					randX1 = (generator.nextInt(1501) + current.x())*current.scale();
-					randY1 = (generator.nextInt(1501) + current.y())*current.scale();
 					
-					current1 = new Planet( Names.generatePlanetName(current, generator), randX1+( current.scale()*32 ) + 50, 
-							randY1+( current.scale()*32 ) + 50, randScale1, randTerrestrial,
-							randTemp1, atmos, planetImage );
+					randXP = (generator.nextInt(1501) + current.x())*current.scale();
+					randYP = (generator.nextInt(1501) + current.y())*current.scale();
+					
+					currentplanet = new Planet( Names.generatePlanetName(current, generator), randXP+( current.scale()*32 ) + 50, 
+							randYP+( current.scale()*32 ) + 50, randScaleP, randTerrestrial,
+							randTempP, randAtmos, planetImage );
 					buffer++;
 				}
 				buffer = 0;
-				if ( i1 > 1 ) {
-					Planet closest = closestPlanet( current1 );
-					randX1 = generator.nextInt(2001) + current.x() - 1000;
-					randY1 = generator.nextInt(2001) + current.y() - 1000;
-					while( Util.dist(closest.x(), closest.y(), current1.x() , current1.y()) < 200.0 ) {
+				
+				/*
+				 * 	// distance between each planet
+				 */
+				if ( p > 1 ) {
+					Planet closest = closestPlanet( currentplanet );
+					randXP = generator.nextInt(2001) + current.x() - 1000;
+					randYP = generator.nextInt(2001) + current.y() - 1000;
+					while( Util.dist(closest.x(), closest.y(), currentplanet.x() , currentplanet.y()) < 200.0 ) {
 						if ( buffer > 10000 )
 							break;
 						
-						current1 = new Planet( Names.generatePlanetName(current, generator), randX1, randY1, 
-								randScale1, randTerrestrial, randTemp1, atmos, planetImage );
+						currentplanet = new Planet( Names.generatePlanetName(current, generator), randXP, randYP, 
+								randScaleP, randTerrestrial, randTempP, randAtmos, planetImage );
 						buffer++;
 					}
 				}
 				
-				solarSys.addPlanet( current1 );
+				/* Adds the planet to the solar system */
+				solarSys.addPlanet( currentplanet );
 				
-				countChilds++;
+				if ( currentplanet.supportsLife() ) {
+					generateNPC( currentplanet, generator );
+					System.out.println("Added a NPC!!");
+				}
 				
 			}
 			
-			if ( this.allSolarSystems.size() > 2 ) {
+			/*
+			 *   // if there are more than 1 solar systems
+			 */
+			if ( this.allSolarSystems.size() > 1 ) {
 				for ( SolarSystem sys : allSolarSystems ) {
 					if( Util.dist( sys.x(), sys.y(), solarSys.x(), solarSys.y() ) < sys.size() ) {
 						
-						solarSys.setPosition(solarSys.x()+(int)sys.size(), solarSys.y()-(int)sys.size());
+						randX = generator.nextInt(1001 * distanceFactor)-(int)(1000/(distanceFactor*1.0));
+						randY = generator.nextInt(1001 * distanceFactor)-(int)(1000/(distanceFactor*1.0)); 
+						solarSys.setPosition(randX, randY);
 						current = solarSys.getStar();
+						
+						System.out.println("Changed position of solar system: " + solarSys.name() + "! Star: " + current.name() );
 					}
 				}
 			}
 			
-			for( Planet p : current.getChildPlanets())
-				this.allPlanets.add( p );
-			
+			/* Adds this solar system to the list */
 			this.allSolarSystems.add( solarSys );
-			this.allStars.add( current );
-			countStars++;
+			
+			System.out.println("Added solar system [" + solarSys.name() + "]" );
+			countSystems++;
+			
+			/* Adds the solar system's star and planets to the appropriate lists */
+			for ( SolarSystem s : this.allSolarSystems ) {
+				
+				if ( !this.allStars.contains(s.getStar()) ) {
+					this.allStars.add(s.getStar());
+					System.out.println("Added in solar system [" + s.name() + "] the star: " + s.getStar().name() );
+					countStars++;
+				}
+				
+				for ( Planet p : s.getSolarPlanets() ) {
+					this.allPlanets.add(p);
+					countChilds++;
+				}
+				
+			}
 			
 		}
 		
@@ -170,15 +214,31 @@ public class World {
 			
 			this.allPlanets.add( current );
 			
+			if ( current.supportsLife() ) {
+				generateNPC( current, generator );
+				System.out.println("Added a NPC!!");
+			}
+			
 			countPlanets++;
 			
 		}
 		
-		System.out.println("Created " + countStars + " stars, " + countPlanets 
-				+ " planets and " + countChilds + " child planets!");
+		System.out.println("Created " + countSystems + " Star systems with " + countStars + " stars and " + countChilds
+				+ " planets! \n" + countPlanets + " orphan planets have been created!");
 		
 		
 	}
+	
+	/*
+	 * 
+	 * 
+	 * 
+	 *  GAME EVENTS
+	 * 
+	 * 
+	 * 
+	 * 
+	 */
 	
 	/**
 	 * 
@@ -241,6 +301,11 @@ public class World {
 		}
 		
 		g.setColor(new Color(255,255,255,255));
+		
+		for( NPC npc : this.allNPCs ) {
+			npc.image().setRotation( (float)npc.rotation() );
+			g.drawImage(npc.image(), npc.x(), npc.y());
+		}
 	}
 	
 	
@@ -249,9 +314,30 @@ public class World {
 	 * @param window
 	 * @param dt
 	 */
-	public void update( GameContainer window, int dt ) {
+	public void update( GameContainer window, int dt, Player player ) {
+		
+		for( NPC npc : this.allNPCs ) {
+			if ( Util.dist(player.x(), player.y(), npc.x(), npc.y() ) < 1920.0 ) {
+				npc.think();
+			}
+		}
 		
 	}
+	
+	/**
+	 * ------------------------------------------------------------------------------------------------------------------
+	 */
+	
+	/*
+	 *
+	 * 
+	 * 
+	 *  METHODS
+	 * 
+	 * 
+	 * 
+	 * 
+	 */
 	
 	/**
 	 * 
@@ -314,6 +400,24 @@ public class World {
 		}
 		
 		return closest;
+	}
+	
+	/**
+	 * 
+	 * @param p
+	 * @return
+	 * @throws SlickException 
+	 */
+	public void generateNPC( Planet p, Random rd ) throws SlickException {
+		
+		String name = p.name();
+		int x = p.x();
+		int y = p.y();
+		String path = "gfx/sprite_ships_small.png";
+		int randomShip = rd.nextInt(4);
+		
+		this.allNPCs.add(new NPC( name, x, y, path, randomShip, 0));
+		
 	}
 		
 }
