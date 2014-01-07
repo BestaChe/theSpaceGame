@@ -32,13 +32,30 @@ public class GUI {
 		
 	}
 	
-	public void update( GameContainer window, int dt ) {
+	/**
+	 * 
+	 * @param window
+	 * @param dt
+	 */
+	public void updateMAIN( GameContainer window, int dt ) {
 		
 	}
 	
-	public void render( GameContainer window, Graphics g, Player p ) {
-		
-		g.drawImage(this.img, (int)(( this.x * window.getWidth() ) / 800.0) , (int)(( this.y * window.getWidth() ) / 600.0) );
-		
+	/**
+	 * 
+	 * @param window
+	 * @param g
+	 * @param p
+	 */
+	public void renderMAIN( GameContainer window, Graphics g, Player p ) {
+		g.drawImage(this.img, this.x, this.y);
+	}
+	
+	public int x( GameContainer window ) {
+		return this.x;
+	}
+	
+	public int y( GameContainer window ) {
+		return this.y;
 	}
 }

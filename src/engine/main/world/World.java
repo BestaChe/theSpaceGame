@@ -15,11 +15,12 @@ import engine.main.entities.NPC;
 import engine.main.entities.Planet;
 import engine.main.entities.Player;
 import engine.main.entities.Star;
+import engine.main.entities.weapons.Damage;
 
 public class World {
 	
-	public static final int MAX_STARS = 5;
-	public static final int MAX_PLANETS_ALONE = 10;
+	public static final int MAX_STARS = 10;
+	public static final int MAX_PLANETS_ALONE = 5;
 	public static final int MAX_PLANETS_PER_STAR = 6;
 	
 	private String name;
@@ -55,12 +56,12 @@ public class World {
 	 * 
 	 * @throws SlickException
 	 */
-	public void generateWorld() throws SlickException {
+	public void generateWorld( ) throws SlickException {
 		
 		int numberOfStars = (int)((World.MAX_STARS * this.density)+0.5);
 		int numberOfPlanets = (int)((World.MAX_PLANETS_ALONE * this.density)+0.5);
 		
-		int distanceFactor = 5;
+		int distanceFactor = 10;
 		
 		int countStars = 0;
 		int countPlanets = 0;
@@ -77,7 +78,7 @@ public class World {
 			int randScale = generator.nextInt(4) + 2; // minimum 1, maximum 6
 			randX = generator.nextInt(1001 * distanceFactor)-(int)(1000/(distanceFactor*1.0));
 			randY = generator.nextInt(1001 * distanceFactor)-(int)(1000/(distanceFactor*1.0)); 
-			Image starImage = new Image( "gfx/star_1.png" );
+			Image starImage = new Image( "gfx/astros/star_1.png" );
 			
 			Star current = new Star( randName , randX, randY, randScale, randTemp, starImage );
 			
@@ -97,9 +98,9 @@ public class World {
 				boolean randAtmos = generator.nextBoolean();
 				Image planetImage;
 				if ( randTerrestrial )
-					planetImage = new Image( "gfx/terr_planet_base_1.png");
+					planetImage = new Image( "gfx/astros/terr_planet_base_1.png");
 				else
-					planetImage = new Image( "gfx/gas_planet_base_1.png");
+					planetImage = new Image( "gfx/astros/gas_planet_base_1.png");
 				
 				Planet currentplanet = new Planet( Names.generatePlanetName(current, generator), randXP, randYP, 
 						randScaleP, randTerrestrial, randTempP, randAtmos, planetImage );
@@ -109,17 +110,16 @@ public class World {
 				/*
 				 *  // distance between planet and star
 				 */
-				while( Util.dist(current.x(), current.y(), currentplanet.x(), currentplanet.y()) 
-						< ( current.scale()*32 + currentplanet.scale()*16 ) ) {
+				while( current.shape().intersects(currentplanet.shape()) || current.shape().contains(currentplanet.x(), currentplanet.y()) ) {
 					
-					if ( buffer > 10000 ) 
+					if ( buffer > 750 ) 
 						break;
 					
-					randXP = (generator.nextInt(1501) + current.x())*current.scale();
-					randYP = (generator.nextInt(1501) + current.y())*current.scale();
+					randXP = current.x() + generator.nextInt(2001) - 1000;
+					randYP = current.y() + generator.nextInt(2001) - 1000 ;
 					
-					currentplanet = new Planet( Names.generatePlanetName(current, generator), randXP+( current.scale()*32 ) + 50, 
-							randYP+( current.scale()*32 ) + 50, randScaleP, randTerrestrial,
+					currentplanet = new Planet( Names.generatePlanetName(current, generator), randXP+( current.scale()*32 )*2, 
+							randYP+( current.scale()*32 )*2, randScaleP, randTerrestrial,
 							randTempP, randAtmos, planetImage );
 					buffer++;
 				}
@@ -130,17 +130,18 @@ public class World {
 				 */
 				if ( p > 1 ) {
 					Planet closest = closestPlanet( currentplanet );
-					randXP = generator.nextInt(2001) + current.x() - 1000;
-					randYP = generator.nextInt(2001) + current.y() - 1000;
-					while( Util.dist(closest.x(), closest.y(), currentplanet.x() , currentplanet.y()) < 200.0 ) {
-						if ( buffer > 10000 )
+					while( closest.shape().intersects(currentplanet.shape()) || closest.shape().contains(currentplanet.x(), currentplanet.y()) ) {
+						if ( buffer > 750 )
 							break;
 						
+						randXP = generator.nextInt(4001) + current.x() - 2000;
+						randYP = generator.nextInt(4001) + current.y() - 2000 ;
 						currentplanet = new Planet( Names.generatePlanetName(current, generator), randXP, randYP, 
 								randScaleP, randTerrestrial, randTempP, randAtmos, planetImage );
 						buffer++;
 					}
 				}
+				buffer = 0;
 				
 				/* Adds the planet to the solar system */
 				solarSys.addPlanet( currentplanet );
@@ -155,17 +156,25 @@ public class World {
 			/*
 			 *   // if there are more than 1 solar systems
 			 */
-			if ( this.allSolarSystems.size() > 1 ) {
-				for ( SolarSystem sys : allSolarSystems ) {
-					if( Util.dist( sys.x(), sys.y(), solarSys.x(), solarSys.y() ) < sys.size() ) {
-						
-						randX = generator.nextInt(1001 * distanceFactor)-(int)(1000/(distanceFactor*1.0));
-						randY = generator.nextInt(1001 * distanceFactor)-(int)(1000/(distanceFactor*1.0)); 
+			int buffer = 0;
+			for ( SolarSystem sys : allSolarSystems ) {
+
+				if ( !sys.equals(solarSys) ) {
+					while( sys.area().intersects(solarSys.area() ) || sys.area().contains(solarSys.x(), solarSys.y()) ) {
+
+						if ( buffer > 750 )
+							break;
+
+						randX = generator.nextInt(2001 * distanceFactor)-(int)(2000/(distanceFactor*1.0));
+						randY = generator.nextInt(2001 * distanceFactor)-(int)(2000/(distanceFactor*1.0)); 
 						solarSys.setPosition(randX, randY);
 						current = solarSys.getStar();
-						
+
 						System.out.println("Changed position of solar system: " + solarSys.name() + "! Star: " + current.name() );
+						System.out.println("New Position: " + solarSys.x() + " || " + solarSys.y() );
+						buffer++;
 					}
+					buffer = 0;
 				}
 			}
 			
@@ -196,21 +205,45 @@ public class World {
 		// make orphan planets
 		for ( int i = 1; i <= numberOfPlanets; i++ ) {
 			
+			int randX;
+			int randY;
 			int randTemp = generator.nextInt(451)+1; // minimum 0, maximum 450 kelvin
 			int randScale = generator.nextInt(2) + 1; // minimum 1, maximum 2
-			int randX = generator.nextInt(8001)-4000; // minimum -4000, maximum 4000
-			int randY = generator.nextInt(8001)-4000; // minimum -4000, maximum 4000
+			randX = generator.nextInt(8001)-4000; // minimum -4000, maximum 4000
+			randY = generator.nextInt(8001)-4000; // minimum -4000, maximum 4000
 			boolean randTerrestrial = generator.nextBoolean();
 			boolean atmos = generator.nextBoolean();
 			Image planetImage;
 			
 			if ( randTerrestrial )
-				planetImage = new Image( "gfx/terr_planet_base_1.png");
+				planetImage = new Image( "gfx/astros/terr_planet_base_1.png");
 			else
-				planetImage = new Image( "gfx/gas_planet_base_1.png");
+				planetImage = new Image( "gfx/astros/gas_planet_base_1.png");
 			
 			Planet current = new Planet( Names.generatePlanetName(generator), randX, randY, 
 					randScale, randTerrestrial, randTemp, atmos, planetImage );
+			
+			for( Star s : this.allStars ) {
+				while( Util.dist(s.x(), s.y(), current.x(), current.y()) < ( s.scale()*32 + 100 ) ) {
+					randX = generator.nextInt(8001)-4000; // minimum -4000, maximum 4000
+					randY = generator.nextInt(8001)-4000; // minimum -4000, maximum 4000
+					
+					current = new Planet( Names.generatePlanetName(generator), randX, randY, 
+							randScale, randTerrestrial, randTemp, atmos, planetImage );
+				}
+			}
+			
+			for( Planet p : this.allPlanets ) {
+				while( Util.dist(p.x(), p.y(), current.x() , current.y()) < 200.0 ) {
+					
+					randX = generator.nextInt(8001)-4000; // minimum -4000, maximum 4000
+					randY = generator.nextInt(8001)-4000; // minimum -4000, maximum 4000
+					
+					current = new Planet( Names.generatePlanetName(generator), randX, randY, 
+							randScale, randTerrestrial, randTemp, atmos, planetImage );
+					
+				}
+			}
 			
 			this.allPlanets.add( current );
 			
@@ -247,6 +280,12 @@ public class World {
 	 * @throws SlickException 
 	 */
 	public void render( GameContainer window, Graphics g, Player player) {
+		
+		// draw areas
+		
+		/*for( SolarSystem solar : allSolarSystems ) {
+			solar.renderArea(window, g);
+		}*/
 		
 		// draw stars
 		g.setColor(new Color(255,255,255,255));
@@ -289,7 +328,7 @@ public class World {
 					try {
 
 						Image atmosImage;
-						atmosImage = new Image( "gfx/terr_planet_atmosphere_1.png" ).getScaledCopy( (float)Math.ceil(p.scale()/2.0) );
+						atmosImage = new Image( "gfx/astros/terr_planet_atmosphere_1.png" ).getScaledCopy( (float)Math.ceil(p.scale()/2.0) );
 						g.drawImage( atmosImage, p.x() - atmosImage.getWidth()/2, p.y() - atmosImage.getHeight()/2 );
 
 					} catch (SlickException e1) {
@@ -303,9 +342,16 @@ public class World {
 		g.setColor(new Color(255,255,255,255));
 		
 		for( NPC npc : this.allNPCs ) {
+			
+			/* DEBUG */
+			//g.fill(npc.shape());
+			
 			npc.image().setRotation( (float)npc.rotation() );
 			g.drawImage(npc.image(), npc.x(), npc.y());
+			
+			npc.render(window, g);
 		}
+		
 	}
 	
 	
@@ -313,12 +359,22 @@ public class World {
 	 * 
 	 * @param window
 	 * @param dt
+	 * @throws SlickException 
 	 */
-	public void update( GameContainer window, int dt, Player player ) {
+	public void update( GameContainer window, int dt, Player player ) throws SlickException {
 		
-		for( NPC npc : this.allNPCs ) {
+		for( int i = 0; i <= this.allNPCs.size() - 1; i ++ ) {
+			NPC npc = this.allNPCs.get(i);
+			npc.update(window, dt);
+			
 			if ( Util.dist(player.x(), player.y(), npc.x(), npc.y() ) < 1920.0 ) {
-				npc.think();
+				npc.think(player);
+				
+				if ( npc.health() == 0 )
+					this.allNPCs.remove(i);
+				
+				Damage.BulletCollisionWithNPC(player.weapon(), npc);
+				Damage.BulletCollisionWithPlayer(npc.weapon(), npc, player);
 			}
 		}
 		
@@ -353,6 +409,14 @@ public class World {
 	 */
 	public ArrayList<Star> returnStars() {
 		return this.allStars;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public ArrayList<SolarSystem> returnSolarSystems() {
+		return this.allSolarSystems;
 	}
 	
 	/**
@@ -413,10 +477,10 @@ public class World {
 		String name = p.name();
 		int x = p.x();
 		int y = p.y();
-		String path = "gfx/sprite_ships_small.png";
+		String path = "gfx/ships/sprite_ships_big.png";
 		int randomShip = rd.nextInt(4);
 		
-		this.allNPCs.add(new NPC( name, x, y, path, randomShip, 0));
+		this.allNPCs.add(new NPC( name, x, y, path, 0, 0, 2, 0));
 		
 	}
 		

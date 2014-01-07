@@ -28,7 +28,12 @@ public class MainClass extends StateBasedGame {
 		super(title);
 
 	}
-
+	
+	/**
+	 * The Main method! Magic happens here :D
+	 * @param args
+	 * @throws SlickException
+	 */
 	public static void main(String[] args) throws SlickException {
 
 		AppGameContainer window = new AppGameContainer( new MainClass(MainClass.GAME_NAME) );
@@ -36,10 +41,14 @@ public class MainClass extends StateBasedGame {
 		window.setDisplayMode( MainClass.WINDOW_WIDTH, MainClass.WINDOW_HEIGHT, MainClass.WINDOW_FULLSCREEN );
 		window.setTargetFrameRate( 60 );
 		window.setAlwaysRender( false );
+		window.setMouseGrabbed(true);
 		window.start();
 		
 	}
-
+	
+	/**
+	 * Initializes the stateList
+	 */
 	public void initStatesList(GameContainer window) throws SlickException {
 		
 		GameState_Playing gameStatePlaying = new GameState_Playing();

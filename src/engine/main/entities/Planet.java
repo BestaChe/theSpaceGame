@@ -6,15 +6,19 @@ import org.newdawn.slick.Color;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 
+import engine.main.Util;
+
 public class Planet extends AstronomicalObject {
 
 	private String name;
 	private int temperature;
 	private boolean terrestrian;
 	private boolean hasAtmosphere;
-	private int detail;
+	private int appearenceDetail;
 	
 	private Color planetColor;
+	
+	private int material;
 	
 	/**
 	 * Constructs the planet
@@ -36,20 +40,27 @@ public class Planet extends AstronomicalObject {
 		this.hasAtmosphere = hasAtmosphere;
 		this.planetColor = new Color(255, 255, 255);
 		
+		this.material = 0;
+		
+		/* Details */
 		if ( Math.abs(this.temperature - 278) < 30 )
-			this.detail = 1;
+			this.appearenceDetail = 1;
 		
 		else if ( Math.abs(this.temperature) > 308 )
-			this.detail = 2;
+			this.appearenceDetail = 2;
 
 		else if ( Math.abs(this.temperature) < 248 )
-			this.detail = 3;
+			this.appearenceDetail = 3;
 		else
-			this.detail = 0;
+			this.appearenceDetail = 0;
 		
+		/**
+		 * Terrestrian Stuff
+		 */
 		Random rd = new Random();
 		if ( this.terrestrian ) {
 			
+			/* Colours */
 			if ( this.temperature <= 130 ) {
 				int rVal = rd.nextInt( 100 );
 				this.planetColor = new Color( 255 - rVal, 255 - rVal, 255 - rVal );
@@ -62,6 +73,15 @@ public class Planet extends AstronomicalObject {
 				int rVal = rd.nextInt( 100 );
 				this.planetColor = new Color( 255 , 255 -rVal , 255 - rVal );
 			}
+			
+			/* Mining Materials */
+			int chanceToHaveMaterials = rd.nextInt(3);
+			
+			if ( chanceToHaveMaterials < 2 ) {
+				this.material = Util.randomBetween(1,4);
+				System.out.println("Planet made with material ID: " + this.material);
+			}
+			
 		}
 		
 	}
@@ -119,7 +139,7 @@ public class Planet extends AstronomicalObject {
 	 * @return
 	 */
 	public boolean hasDetail() {
-		return ( this.detail > 0 ? true : false );
+		return ( this.appearenceDetail > 0 ? true : false );
 	}
 	
 	/**
@@ -136,16 +156,32 @@ public class Planet extends AstronomicalObject {
 	 * @throws SlickException
 	 */
 	public String detail() {
-		switch( this.detail ) {
+		switch( this.appearenceDetail ) {
 		case 1:
-			return "gfx/terr_planet_detail_water.png";
+			return "gfx/astros/terr_planet_detail_water.png";
 		case 2:
-			return "gfx/terr_planet_detail_volcano.png";
+			return "gfx/astros/terr_planet_detail_volcano.png";
 		case 3:
-			return "gfx/terr_planet_detail_wrecked.png";
+			return "gfx/astros/terr_planet_detail_wrecked.png";
 		default:
-			return "gfx/terr_planet_detail_water.png";
+			return "gfx/astros/terr_planet_detail_water.png";
 		}
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public int rawDetail() {
+		return this.appearenceDetail;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public int materials() {
+		return this.material;
 	}
 	/**
 	 * 

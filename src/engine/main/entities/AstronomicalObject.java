@@ -23,7 +23,7 @@ public class AstronomicalObject {
 		this.x = x;
 		this.y = y;
 		this.scale = scale;
-		this.shape = new Circle( x, y, (int)(scale*( AstronomicalObject.ASTRO_IMAGE_SIZE /4.0) ) );
+		this.shape = new Circle( this.x, this.y, (int)(this.scale*( AstronomicalObject.ASTRO_IMAGE_SIZE /4.0) ) );
 		this.image = image;
 	}
 	
@@ -75,8 +75,8 @@ public class AstronomicalObject {
 	public void setPosition( int x, int y ) {
 		this.x = x;
 		this.y = y;
-		this.shape().setCenterX(x);
-		this.shape().setCenterY(y);
+		this.shape().setCenterX(this.x);
+		this.shape().setCenterY(this.y);
 	}
 	
 }

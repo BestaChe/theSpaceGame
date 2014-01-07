@@ -17,15 +17,19 @@ public class Camera {
    /** the parallax constant of the camera */
    protected double parallaxConstant;
    
+   /** ZOOM */
+   protected float zoom;
+   
    /**
     * Create a new camera
     * 
     * @param gc the GameContainer, used for getting the size of the GameCanvas
     * @param map the TiledMap used for the current scene
     */
-   public Camera(GameContainer gc, int layer) {
+   public Camera(GameContainer gc, int layer, float zoom ) {
       
       this.gc = gc;
+      this.zoom = zoom;
       this.parallaxConstant = 1 /((layer + 1)*1.0);
    }
    
@@ -37,8 +41,8 @@ public class Camera {
     */
    public void centerOn(float x, float y) {
       //try to set the given position as center of the camera by default
-      cameraX = x - gc.getWidth()  / 2;
-      cameraY = y - gc.getHeight() / 2;
+      cameraX = ((x) - (gc.getWidth())  / 2) * (1/zoom);
+      cameraY = ((y) - (gc.getHeight()) / 2) * (1/zoom);
    }
    
    /**
@@ -66,22 +70,40 @@ public class Camera {
     * can be drawn with it's NATURAL coordinates.
     */
    public void translateGraphics() {
-	   gc.getGraphics().translate((float)(-(cameraX)*parallaxConstant), (float)(-(cameraY)*parallaxConstant));
+	   gc.getGraphics().scale(zoom, zoom);
+	   gc.getGraphics().translate((float)(-((cameraX))*parallaxConstant)*zoom, (float)(-((cameraY))*parallaxConstant)*zoom);
    }
    /**
     * Reverses the Graphics-translation of Camera.translatesGraphics().
     * Call this before drawing HUD-elements or the like
     */
    public void untranslateGraphics() {
-	   gc.getGraphics().translate((float)((cameraX)*parallaxConstant), (float)((cameraY)*parallaxConstant));
+	   gc.getGraphics().scale(1.0f, 1.0f);
+	   gc.getGraphics().translate((float)((cameraX)*parallaxConstant)*zoom, (float)((cameraY)*parallaxConstant)*zoom);
    }
    
+   /**
+    * 
+    * @param zoom
+    */
+   public void setZoom( float zoom ) {
+	   this.zoom = zoom;
+   }
+   
+   /**
+    * Returns the camera position X
+    * @return float cameraX
+    */
    public float camX() {
-	   return cameraX;
+	   return cameraX*zoom;
    }
    
+   /**
+    * Returns the camera position Y
+    * @return float cameraY
+    */
    public float camY() {
-	   return cameraY;
+	   return cameraY*zoom;
    }
    
 }
