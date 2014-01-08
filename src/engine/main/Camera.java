@@ -7,6 +7,8 @@ public class Camera {
    
    /** the GameContainer, used for getting the size of the GameCanvas */
    protected GameContainer gc;
+   protected int gcWidth;
+   protected int gcHeight;
 
    /** the x-position of our "camera" in pixel */
    protected float cameraX;
@@ -20,6 +22,10 @@ public class Camera {
    /** ZOOM */
    protected float zoom;
    
+   /** object pos */
+   protected float objectX;
+   protected float objectY;
+   
    /**
     * Create a new camera
     * 
@@ -30,7 +36,9 @@ public class Camera {
       
       this.gc = gc;
       this.zoom = zoom;
-      this.parallaxConstant = 1 /((layer + 1)*1.0);
+      this.gcWidth = (int)(gc.getWidth());
+      this.gcHeight = (int)(gc.getHeight());
+      this.parallaxConstant = (1 /((layer + 1)*1.0)) * this.zoom;
    }
    
    /**
@@ -41,8 +49,15 @@ public class Camera {
     */
    public void centerOn(float x, float y) {
       //try to set the given position as center of the camera by default
-      cameraX = ((x) - (gc.getWidth())  / 2) * (1/zoom);
-      cameraY = ((y) - (gc.getHeight()) / 2) * (1/zoom);
+	   
+	   float distX = (float)((((this.gcWidth) * 0.5f ) - x)*parallaxConstant);
+	   float distY = (float)((((this.gcHeight) * 0.5f ) - y)*parallaxConstant);
+	   
+	   this.objectX = x;
+	   this.objectY = y;
+	  
+	   cameraX = distX;
+	   cameraY = distY;
    }
    
    /**
@@ -70,16 +85,19 @@ public class Camera {
     * can be drawn with it's NATURAL coordinates.
     */
    public void translateGraphics() {
-	   gc.getGraphics().scale(zoom, zoom);
-	   gc.getGraphics().translate((float)(-((cameraX))*parallaxConstant)*zoom, (float)(-((cameraY))*parallaxConstant)*zoom);
+	   
+	   scaleGraphics( this.zoom );
+	   gc.getGraphics().translate(cameraX, cameraY);
    }
    /**
     * Reverses the Graphics-translation of Camera.translatesGraphics().
     * Call this before drawing HUD-elements or the like
     */
    public void untranslateGraphics() {
-	   gc.getGraphics().scale(1.0f, 1.0f);
-	   gc.getGraphics().translate((float)((cameraX)*parallaxConstant)*zoom, (float)((cameraY)*parallaxConstant)*zoom);
+	   
+	   scaleGraphics( 1.0f );
+	   gc.getGraphics().translate(-cameraX, -cameraY);
+	
    }
    
    /**
@@ -88,6 +106,7 @@ public class Camera {
     */
    public void setZoom( float zoom ) {
 	   this.zoom = zoom;
+	   System.out.println(zoom);
    }
    
    /**
@@ -95,7 +114,7 @@ public class Camera {
     * @return float cameraX
     */
    public float camX() {
-	   return cameraX*zoom;
+	   return -cameraX;
    }
    
    /**
@@ -103,7 +122,18 @@ public class Camera {
     * @return float cameraY
     */
    public float camY() {
-	   return cameraY*zoom;
+	   return -cameraY;
+   }
+   
+   /**
+    * 
+    * @param zoom
+    */
+   public void scaleGraphics( float zoom ) {
+	   
+	   gc.getGraphics().translate(((( this.gcWidth ) / 2.0f) ) , ((( this.gcHeight ) / 2.0f) ));
+	   gc.getGraphics().scale((float) zoom, (float) zoom);
+	   gc.getGraphics().translate(-(((( this.gcWidth ) / 2.0f) )), -(((( this.gcHeight ) / 2.0f) )));
    }
    
 }

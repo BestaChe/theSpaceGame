@@ -22,6 +22,7 @@ public class World {
 	public static final int MAX_STARS = 10;
 	public static final int MAX_PLANETS_ALONE = 5;
 	public static final int MAX_PLANETS_PER_STAR = 6;
+	public static final double RENDER_DISTANCE = 1980.0;
 	
 	private String name;
 	private double density;
@@ -61,7 +62,7 @@ public class World {
 		int numberOfStars = (int)((World.MAX_STARS * this.density)+0.5);
 		int numberOfPlanets = (int)((World.MAX_PLANETS_ALONE * this.density)+0.5);
 		
-		int distanceFactor = 10;
+		int distanceFactor = 100;
 		
 		int countStars = 0;
 		int countPlanets = 0;
@@ -76,8 +77,8 @@ public class World {
 			String randName = Names.generateStarName(generator);
 			int randTemp = generator.nextInt(10001) + 2000; // minimum 2000, maximum 10000 kelvin
 			int randScale = generator.nextInt(4) + 2; // minimum 1, maximum 6
-			randX = generator.nextInt(1001 * distanceFactor)-(int)(1000/(distanceFactor*1.0));
-			randY = generator.nextInt(1001 * distanceFactor)-(int)(1000/(distanceFactor*1.0)); 
+			randX = generator.nextInt(1001 * distanceFactor)-(int)(500*(distanceFactor*1.0));
+			randY = generator.nextInt(1001 * distanceFactor)-(int)(500*(distanceFactor*1.0)); 
 			Image starImage = new Image( "gfx/astros/star_1.png" );
 			
 			Star current = new Star( randName , randX, randY, randScale, randTemp, starImage );
@@ -283,16 +284,22 @@ public class World {
 		
 		// draw areas
 		
-		/*for( SolarSystem solar : allSolarSystems ) {
-			solar.renderArea(window, g);
-		}*/
+		for( SolarSystem solar : allSolarSystems ) {
+			if( Util.dist(solar.x(), solar.y(), player.x(), player.y()) < 
+					World.RENDER_DISTANCE * ( 1 / player.mouseZoom() ) * 10 ) {
+				
+				if ( player.mouseZoom() != 1.0 ) {
+					solar.renderArea(window, g);
+				}
+			}
+		}
 		
 		// draw stars
 		g.setColor(new Color(255,255,255,255));
 		
 		for( Star e : allStars ) {
 
-			if( Util.dist(e.x(), e.y(), player.x(), player.y()) < 1980.0 ) {
+			if( Util.dist(e.x(), e.y(), player.x(), player.y()) < World.RENDER_DISTANCE ) {
 				g.setColor(e.color());
 				g.fill(e.shape());
 				Image scaledImage = e.image().getScaledCopy( e.scale() );
@@ -305,7 +312,7 @@ public class World {
 		// draw planets
 		for( Planet p : allPlanets ) {
 
-			if( Util.dist(p.x(), p.y(), player.x(), player.y()) < 1980.0 ) {
+			if( Util.dist(p.x(), p.y(), player.x(), player.y()) < World.RENDER_DISTANCE ) {
 				g.setColor(p.color());
 				g.fill(p.shape());
 				Image scaledImage = p.image().getScaledCopy( (float)Math.ceil(p.scale()/2.0) );
@@ -367,7 +374,7 @@ public class World {
 			NPC npc = this.allNPCs.get(i);
 			npc.update(window, dt);
 			
-			if ( Util.dist(player.x(), player.y(), npc.x(), npc.y() ) < 1920.0 ) {
+			if ( Util.dist(player.x(), player.y(), npc.x(), npc.y() ) < World.RENDER_DISTANCE ) {
 				npc.think(player);
 				
 				if ( npc.health() == 0 )

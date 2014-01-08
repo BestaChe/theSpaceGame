@@ -39,11 +39,12 @@ public class GameState_Playing extends BasicGameState {
 	// WORLD
 	private World world = new World( "DEFAULT", 0.7 );
 	private Image backgroundNebulae;
+	private Image galaxy;
 	
 	// CAMERA
 	private static final int MAX_PARALLAX_SPRITES = 800;
 	private float zoom;
-	private Camera camera[] = new Camera[5];
+	private Camera camera[] = new Camera[6];
 	private ArrayList<Circle> parallax;
 	private ArrayList<Circle> parallax2;
 	private ArrayList<Circle> parallax3;
@@ -71,10 +72,15 @@ public class GameState_Playing extends BasicGameState {
 		camera[2] = new Camera( window, 2, zoom );
 		camera[3] = new Camera( window, 3, zoom );
 		camera[4] = new Camera( window, 15, zoom );
+		camera[5] = new Camera( window, 50, zoom );
 		
 		world.generateWorld();
-		backgroundNebulae = new Image("gfx/main/background_nebulae.png").getScaledCopy(5.0f);
-		backgroundNebulae.setAlpha(50);
+		
+		backgroundNebulae = new Image("gfx/main/background_nebulae.png").getScaledCopy(10.0f);
+		backgroundNebulae.setAlpha(125);
+		
+		galaxy = new Image("gfx/main/background_galaxy.png").getScaledCopy(10.0f);
+		galaxy.setAlpha(5);
 		
 		player = new Player( 0, 0 );
 		
@@ -134,6 +140,8 @@ public class GameState_Playing extends BasicGameState {
 		camera[3].setZoom(zoom);
 		camera[4].centerOn(player.x(), player.y());
 		camera[4].setZoom(zoom);
+		camera[5].centerOn(player.x(), player.y());
+		camera[5].setZoom(zoom);
 		
 		
 		world.update(window, dt, this.player);
@@ -168,8 +176,13 @@ public class GameState_Playing extends BasicGameState {
 		
 		g.drawImage( new Image("gfx/main/background.png"), 0, 0 );
 		
+		camera[5].translateGraphics();
+		g.drawImage(this.galaxy, -1024*10, -1024*10, new Color( 255, 255, 255, (int)(5*(1/player.mouseZoom()))));
+		camera[5].untranslateGraphics();
+		
 		camera[4].translateGraphics();
-		g.drawImage(this.backgroundNebulae, -1024*5, -1024*5);
+		g.drawImage(this.backgroundNebulae, -1024*10, -1024*10, new Color( 255, 255, 255 ));
+		this.backgroundNebulae.setAlpha(player.mouseZoom());
 		camera[4].untranslateGraphics();
 		
 		camera[3].translateGraphics();
@@ -276,17 +289,17 @@ public class GameState_Playing extends BasicGameState {
 		switch( layer ) {
 		case 1:
 			for ( Circle a : parallax ) {
-				g.fill(a);
+					g.fill(a);
 			}
 			break;
 		case 2:
 			for ( Circle a : parallax2 ) {
-				g.fill(a);
+					g.fill(a);
 			}
 			break;
 		case 3:
 			for ( Circle a : parallax3 ) {
-				g.fill(a);
+					g.fill(a);
 			}
 			break;
 		}

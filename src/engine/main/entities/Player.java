@@ -232,8 +232,9 @@ public class Player {
 		// Q - zoom out
 		else if ( window.getInput().isKeyPressed(Input.KEY_Q) ) {
 			
-			if ( this.zoom > 0.0 ) {
-				this.zoom -= 0.1f;
+			if ( this.zoom > 0.0f ) {
+
+				this.zoom *= 0.95f;
 			}
 			
 			this.controlPressed = true;
@@ -242,10 +243,12 @@ public class Player {
 		// R - zoom in
 		else if ( window.getInput().isKeyPressed(Input.KEY_R) ) {
 
-			if ( this.zoom < 1.0 ) {
-				this.zoom += 0.1f;
+			if ( this.zoom < 0.9f ) {
+				this.zoom /= 0.95f;
 			}
-
+			else
+				this.zoom = 1.0f;
+			
 			this.controlPressed = true;
 		}
 		
@@ -346,6 +349,15 @@ public class Player {
 		else
 			this.currentObject = "  Void";
 		
+		
+		/**
+		 * 
+		 * 
+		 *  GUI ARROWS
+		 * 
+		 * 
+		 */
+		
 		ArrayList<SolarSystem> allSolarSystems = world.returnSolarSystems();
 		SolarSystem current = null;
 		
@@ -361,7 +373,10 @@ public class Player {
 			}
 		}
 		
+		// In a system
 		if ( current != null ) {
+			
+			// Star
 			if( Util.dist(this.x, this.y, current.x(), current.y()) < current.size() ) {
 				double arrowLookAt = Math.toDegrees(Math.atan2(this.y-current.y(), this.x-current.x()));
 				this.arrow.setCenterOfRotation(this.arrow.getWidth()/2.0f, this.arrow.getHeight()/2.0f);
@@ -370,7 +385,7 @@ public class Player {
 			}
 
 
-
+			// Planets
 			for( int i = 0; i <= current.getSolarPlanets().size()-1; i++ ) {
 
 				if( Util.dist(this.x, this.y, current.x(), current.y()) < current.size() ) {
@@ -388,10 +403,13 @@ public class Player {
 			for( int i = World.MAX_PLANETS_PER_STAR - 1; i > current.getSolarPlanets().size() - 1 ; i-- ) {
 				this.arrowPlanetRotation[i] = -1.0;
 			}
+			
 		}
+		// Not in a system
 		else {
 			for( int i = 0; i <= World.MAX_PLANETS_PER_STAR - 1; i++ ) {
-				this.arrowPlanetRotation[i] = -1.0;
+				if ( this.arrowPlanetRotation[i] != -1.0 )
+					this.arrowPlanetRotation[i] = -1.0;
 			}
 		}
 		
@@ -454,6 +472,14 @@ public class Player {
 		
 		this.weapon.render(window, g);
 		
+		/**
+		 * 
+		 * 
+		 *  GUI ARROWS
+		 * 
+		 * 
+		 */
+		
 		if( !this.currentSystem.equals("  Not in a system") ) {
 			g.drawImage(this.arrow, 
 					this.x-(this.arrow.getWidth()/2.0f), 
@@ -473,12 +499,6 @@ public class Player {
 		}
 
 	}
-	
-	/**
-	 * Mouse and Keyboard control method. (Link with void update() method )
-	 * @param window - GameContainer window
-	 * @param dt - int delta time
-	 */
 	
 	/**
 	 * 
