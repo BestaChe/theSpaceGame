@@ -6,9 +6,9 @@ public class AstronomicalObject {
 	
 	public static final int ASTRO_IMAGE_SIZE = 128;
 	
-	private int x;
-	private int y;
-	private int scale;
+	private float x;
+	private float y;
+	private float scale;
 	
 	private Image image;
 	private Circle shape;
@@ -19,11 +19,11 @@ public class AstronomicalObject {
 	 * @param y - y position of the object
 	 * @param scale - the scale of the object
 	 */
-	public AstronomicalObject( int x, int y, int scale, Image image ) {
+	public AstronomicalObject( float x, float y, float scale, Image image ) {
 		this.x = x;
 		this.y = y;
 		this.scale = scale;
-		this.shape = new Circle( this.x, this.y, (int)(this.scale*( AstronomicalObject.ASTRO_IMAGE_SIZE /4.0) ) );
+		this.shape = new Circle( this.x, this.y, (int)((this.scale*2*0.95f)*( AstronomicalObject.ASTRO_IMAGE_SIZE /4.0) ) );
 		this.image = image;
 	}
 	
@@ -31,7 +31,7 @@ public class AstronomicalObject {
 	 * Returns the x position
 	 * @return int x
 	 */
-	public int x() {
+	public float x() {
 		return this.x;
 	}
 	
@@ -39,7 +39,7 @@ public class AstronomicalObject {
 	 * Returns the y position
 	 * @return int y
 	 */
-	public int y() {
+	public float y() {
 		return this.y;
 	}
 	
@@ -47,7 +47,7 @@ public class AstronomicalObject {
 	 * Returns the scale
 	 * @return int scale
 	 */
-	public int scale() {
+	public float scale() {
 		return this.scale;
 	}
 	
@@ -72,7 +72,7 @@ public class AstronomicalObject {
 	 * @param x
 	 * @param y
 	 */
-	public void setPosition( int x, int y ) {
+	public void setPosition( float x, float y ) {
 		this.x = x;
 		this.y = y;
 		this.shape().setCenterX(this.x);

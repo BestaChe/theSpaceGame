@@ -40,7 +40,7 @@ public class InfoWindow extends GUI {
 			this.planet = planet;
 			this.star = null;
 
-			this.image = this.planet.image().getScaledCopy((float) 0.5);
+			this.image = this.planet.image().getScaledCopy(0.5f);
 			this.color = this.planet.color();
 
 			if ( this.planet.hasDetail() && this.planet.isTerrestrian() )
@@ -48,7 +48,7 @@ public class InfoWindow extends GUI {
 			else
 				this.image2 = null;
 
-			if ( this.planet.hasAtmosphere() )
+			if ( this.planet.hasAtmosphere() && this.planet.isTerrestrian() )
 				this.image3 = new Image("gfx/astros/terr_planet_atmosphere_1.png").getScaledCopy((float)0.5);
 			else
 				this.image3 = null;
@@ -59,7 +59,7 @@ public class InfoWindow extends GUI {
 		this.star = star;
 		this.planet = null;
 		
-		this.image = this.star.image();
+		this.image = this.star.image().getScaledCopy(0.25f);
 		this.color = this.star.color();
 		
 		this.image2 = null;
@@ -69,13 +69,13 @@ public class InfoWindow extends GUI {
 	
 	public void render( GameContainer window, Graphics g ) {
 		
-		g.drawImage(this.image, this.x(window) + 160, this.y(window) + 20, this.color);
+		g.drawImage(this.image, this.x(window) + 175, this.y(window) + 20, this.color);
 
 		if ( this.image2 != null )
-			g.drawImage(this.image2, this.x(window) + 160, this.y(window) + 20 );
+			g.drawImage(this.image2, this.x(window) + 175, this.y(window) + 20 );
 
 		if ( this.image3 != null )
-			g.drawImage(this.image3, this.x(window) + 160, this.y(window) + 20 );
+			g.drawImage(this.image3, this.x(window) + 175, this.y(window) + 20 );
 
 		if ( this.planet != null ) {
 			
@@ -94,7 +94,7 @@ public class InfoWindow extends GUI {
 			
 			String name = this.planet.name();
 			String type = ( this.planet.isTerrestrian() ? "Rock" : "Gas");
-			String mass = (this.planet.mass()/2.0) + " Earth's";
+			String mass = (Math.round( this.planet.mass() * 100 ) / 100.0) + " Earth's";
 			String temperature = this.planet.temperature() + "K";
 			String atmos = ( this.planet.hasAtmosphere() ? "Dense" : "Non existant" );
 			String water = ( this.planet.rawDetail() == 1 ? "Oceans" : "Non existant" );
@@ -133,21 +133,18 @@ public class InfoWindow extends GUI {
 			g.setFont(labelFont);
 			g.drawString("    - Star -"		, this.x(window) + 10	, this.y(window) + 20  );
 			g.drawString("Mass:"			, this.x(window) + 10	, this.y(window) + 40  );
-			g.drawString("Child Planets:" 	, this.x(window) + 10	, this.y(window) + 60  );
-			g.drawString("Temperature:"	    , this.x(window) + 10	, this.y(window) + 80 );
-			g.drawString("Name:"			, this.x(window) + 10	, this.y(window) + 100  );
+			g.drawString("Temperature:"	    , this.x(window) + 10	, this.y(window) + 60 );
+			g.drawString("Name:"			, this.x(window) + 10	, this.y(window) + 80  );
 			
 			g.setFont(font);
 			
 			String name = this.star.name();
 			String mass = this.star.mass() + " Sun's";
 			String temperature = this.star.temperature() + "K";
-			String childs = this.star.getChildPlanets().size() + "";
 			
 			g.drawString( mass , this.x(window) + 65			, this.y(window) + 42  );
-			g.drawString( childs , this.x(window) + 130			, this.y(window) + 62  );
-			g.drawString( temperature , this.x(window) + 130	, this.y(window) + 82 );
-			g.drawString( name , this.x(window) + 65			, this.y(window) + 102 );
+			g.drawString( temperature , this.x(window) + 125	, this.y(window) + 62 );
+			g.drawString( name , this.x(window) + 65			, this.y(window) + 82 );
 		}
 	}
 	

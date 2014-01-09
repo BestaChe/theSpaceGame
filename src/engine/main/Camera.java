@@ -106,7 +106,6 @@ public class Camera {
     */
    public void setZoom( float zoom ) {
 	   this.zoom = zoom;
-	   System.out.println(zoom);
    }
    
    /**

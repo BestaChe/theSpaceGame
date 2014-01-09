@@ -4,13 +4,17 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import org.newdawn.slick.Color;
+import org.newdawn.slick.GameContainer;
+import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
+
+import engine.main.Util;
+import engine.main.world.World;
 
 public class Star extends AstronomicalObject {
 
 	private String name;
 	private long temperature;
-	private ArrayList<Planet> childs;
 	
 	private Color starColor;
 	
@@ -22,32 +26,39 @@ public class Star extends AstronomicalObject {
 	 * @param scale - int scale of the star
 	 * @param temperature - int kelvin temperature of the star
 	 */
-	public Star(String name, int x, int y, int scale, long temperature, Image image ) {
-		super(x, y, scale*4, image);
+	public Star(String name, float x, float y, float scale, long temperature, Image image ) {
+		super(x, y, scale, image);
 		
 		this.name = name;
 		this.temperature = temperature;
-		this.childs = new ArrayList<Planet>();
 		
 		
 		// COLOR
 		Random rd = new Random();
-		long difference = Math.abs( this.temperature - 5778 );
-		int colInterval;
-		if (  difference <= 1000 ) {
-			this.starColor = new Color(255, 255, 255);
-		}
+		
+		// dark blue
+		if ( this.temperature <= 50000 && this.temperature > 28000 )
+			this.starColor = new Color(175, 175, 255, 255);
+		// blue
+		else if ( this.temperature <= 28000 && this.temperature > 10000 )
+			this.starColor = new Color(200, 200, 255, 255);
+		// light blue
+		else if ( this.temperature <= 10000 && this.temperature > 7500 )
+			this.starColor = new Color(225, 225, 255, 255);
+		// white
+		else if ( this.temperature <= 7500 && this.temperature > 6000 )
+			this.starColor = new Color(255, 255, 255, 255);
+		// yellow
+		else if ( this.temperature <= 6000 && this.temperature > 5000 )
+			this.starColor = new Color(255, 255, 150, 255);
+		// orange
+		else if ( this.temperature <= 5000 && this.temperature > 3500 )
+			this.starColor = new Color(255, 170, 100, 255);
+		// red
+		else if ( this.temperature <= 3500 )
+			this.starColor = new Color(255, 50, 50, 255);
 		else
-		{
-			if ( this.temperature < 4778 ) {
-				colInterval = (int)Math.abs(rd.nextInt( (int)(( this.temperature/100)+15)));
-				this.starColor = new Color( 255 , 255 - colInterval, 255 - colInterval );
-			}
-			else {
-				colInterval = (int)Math.abs(rd.nextInt( (int)(( this.temperature/100))));
-				this.starColor = new Color( 255 - colInterval, 255 - colInterval, 255 );
-			}
-		}
+			this.starColor = new Color( 255 , 255 , 255 , 255 );
 	}
 	
 	/**
@@ -75,47 +86,28 @@ public class Star extends AstronomicalObject {
 	}
 	
 	/**
-	 * Adds a planet to this star system
-	 * @param planet child
-	 */
-	public void addPlanet( Planet child ) {
-		this.childs.add( child );
-	}
-	
-	/**
-	 * Returns the list of child planets!
-	 * @return arraylist
-	 */
-	public ArrayList<Planet> getChildPlanets() {
-		return this.childs;
-	}
-	/**
-	 * Returns how many planets there are in this system
-	 * @return int number of planets
-	 */
-	public int planetCount() {
-		return this.childs.size();
-	}
-	/**
-	 * 
-	 * @return
-	 */
-	public String details() {
-		StringBuilder str = new StringBuilder();
-		
-		str.append("Name: " + this.name + "\n" );
-		str.append("Mass: " + this.mass() + " times the mass of the sun\n");
-		str.append("Temperature: " + this.temperature + "K\n");
-		str.append("Child Planets: " + this.planetCount() );
-		
-		return str.toString();
-	}
-	
-	/**
 	 * 
 	 * @return
 	 */
 	public Color color() {
 		return this.starColor;
 	}
+	
+	/**
+	 * Render method
+	 * @param window
+	 * @param g
+	 * @param player
+	 */
+	public void render( GameContainer window, Graphics g, Player player ) {
+		
+		if( Util.dist(this.x(), this.y(), player.x(), player.y()) < World.RENDER_DISTANCE ) {
+			g.setColor(this.color());
+			Image scaledImage = this.image().getScaledCopy( (float)(this.scale() / 2.0) );
+			g.drawImage( scaledImage, this.x() - scaledImage.getWidth()/2, this.y() - scaledImage.getHeight()/2, this.color() );
+		}
+		
+	}
+	
+	
 }

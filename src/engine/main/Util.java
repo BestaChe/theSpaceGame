@@ -26,5 +26,16 @@ public class Util {
 		Random rd = new Random();
 		return (rd.nextInt((m-n)+1)+n);
 	}
+	
+	/**
+	 * 
+	 * @param n
+	 * @param m
+	 * @return
+	 */
+	public static float randomFloatBetween( float n, float m ) {
+		Random rd = new Random();
+		return (rd.nextFloat() * (m-n)+n);
+	}
 
 }

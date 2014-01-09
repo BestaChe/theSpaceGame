@@ -15,7 +15,7 @@ public class MainClass extends StateBasedGame {
 	// Window Constants
 	public static final int WINDOW_WIDTH = 800;
 	public static final int WINDOW_HEIGHT = 600;
-	public static final boolean WINDOW_FULLSCREEN = false;
+	public static final boolean WINDOW_FULLSCREEN = true;
 	
 	// Game Constants
 	public static final String GAME_NAME = "SpaceGame v1";

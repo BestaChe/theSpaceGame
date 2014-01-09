@@ -3,10 +3,13 @@ package engine.main.entities;
 import java.util.Random;
 
 import org.newdawn.slick.Color;
+import org.newdawn.slick.GameContainer;
+import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 
 import engine.main.Util;
+import engine.main.world.World;
 
 public class Planet extends AstronomicalObject {
 
@@ -17,6 +20,7 @@ public class Planet extends AstronomicalObject {
 	private int appearenceDetail;
 	
 	private Color planetColor;
+	private int shadowFase;
 	
 	private int material;
 	
@@ -29,16 +33,17 @@ public class Planet extends AstronomicalObject {
 	 * @param terrestrian - boolean is the planet not gas typed
 	 * @param temperature - int temperature of the planet
 	 */
-	public Planet(String name, int x, int y, int scale, boolean terrestrian, int temperature, 
+	public Planet(String name, float x, float y, float scale, boolean terrestrian, int temperature, 
 			boolean hasAtmosphere, Image image) {
 		
-		super(x, y, scale*2, image);
+		super(x, y, scale, image);
 		
 		this.name = name;
 		this.terrestrian = terrestrian;
 		this.temperature = temperature;
 		this.hasAtmosphere = hasAtmosphere;
 		this.planetColor = new Color(255, 255, 255);
+		this.shadowFase = Util.randomBetween(1, 4);
 		
 		this.material = 0;
 		
@@ -83,6 +88,9 @@ public class Planet extends AstronomicalObject {
 			}
 			
 		}
+		else {
+			this.planetColor = new Color( Util.randomBetween(125, 255),Util. randomBetween(125, 255), Util.randomBetween(125, 255) );
+		}
 		
 	}
 	
@@ -122,7 +130,7 @@ public class Planet extends AstronomicalObject {
 	 * Returns the mass of the planet ( 1 scale = 1 earth mass )
 	 * @return int mass
 	 */
-	public int mass() {
+	public float mass() {
 		return this.scale();
 	}
 	
@@ -132,6 +140,18 @@ public class Planet extends AstronomicalObject {
 	 */
 	public Color color() {
 		return this.planetColor;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public int shadowFase() {
+		return this.shadowFase;
+	}
+	
+	public void setShadowFase( int fase ) {
+		this.shadowFase = fase;
 	}
 	
 	/**
@@ -183,20 +203,74 @@ public class Planet extends AstronomicalObject {
 	public int materials() {
 		return this.material;
 	}
+	
 	/**
-	 * 
-	 * @return
+	 * Render method
+	 * @param window
+	 * @param g
+	 * @param player
 	 */
-	public String details() {
-		StringBuilder str = new StringBuilder();
+	public void render( GameContainer window, Graphics g, Player player ) {
+
+		if( Util.dist(this.x(), this.y(), player.x(), player.y()) < World.RENDER_DISTANCE ) {
+			
+			// Draw the Scaled Planet
+			g.setColor(this.color());
+			Image scaledImage = this.image().getScaledCopy( (float)(this.scale() ) );
+			
+			g.drawImage( scaledImage, this.x() - scaledImage.getWidth()/2, this.y() - scaledImage.getHeight()/2, this.color() );
+			
+			// Draw the Details Layer
+			if ( this.hasDetail() && this.isTerrestrian() ) {
+				try {
+
+					Image detailImage = new Image( this.detail() ).getScaledCopy( (float)( this.scale() ) );
+					
+					g.drawImage( detailImage, this.x() - detailImage.getWidth()/2, this.y() - detailImage.getHeight()/2 );
+
+				} catch (SlickException e1) {
+
+					e1.printStackTrace();
+				}
+			}
+
+			// Draw the Atmosphere Layer
+			if ( this.hasAtmosphere() && this.isTerrestrian() ) {
+				try {
+
+					Image atmosImage;
+					atmosImage = new Image( "gfx/astros/terr_planet_atmosphere_1.png" ).getScaledCopy( (float)(this.scale() ) );
+					
+					g.drawImage( atmosImage, this.x() - atmosImage.getWidth()/2, this.y() - atmosImage.getHeight()/2 );
+					atmosImage.setAlpha(125);
+
+				} catch (SlickException e1) {
+
+					e1.printStackTrace();
+				}
+			}
+
+		}
+	}
+	
+	/**
+	 * Render Shadows
+	 * @param window
+	 * @param g
+	 * @param star
+	 * @param player
+	 * @throws SlickException
+	 */
+	public void renderShadows( GameContainer window, Graphics g, Star star, Player player ) throws SlickException {
 		
-		str.append("Name: " + this.name + "\n" );
-		str.append("Mass: " + this.mass() + " times the mass of the Earth\n");
-		str.append("Is terrestrian: " + this.terrestrian + "\n" );
-		str.append("Has atmosphere: " + this.hasAtmosphere + "\n");
-		str.append("Temperature: " + this.temperature + "K");
+		//if( Util.dist(this.x(), this.y(), player.x(), player.y()) < World.RENDER_DISTANCE ) {
+			double shadowRotation = Math.toDegrees( Math.atan2( this.y()-star.y(), this.x()-star.x() ) );
+			Image shadow = new Image("gfx/astros/terr_planet_shadow_" + this.shadowFase() + ".png").getScaledCopy( (float)(this.scale() ) );
 		
-		return str.toString();
+			shadow.setRotation((float)shadowRotation);
+			g.drawImage( shadow, this.x() - shadow.getWidth()/2, this.y() - shadow.getHeight()/2 );
+		//}
+		
 	}
 	
 }
